@@ -1,0 +1,3543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Vignix Ai Assist</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  /* VIGNIX Brand Colors — Light Theme */
+  --bg:#F4F7FA;
+  --surface:#FFFFFF;
+  --surface2:#EEF3F8;
+  --surface3:#E2ECF5;
+  --border:#D0DDED;
+  --border2:#B8CEDF;
+  --accent:#2AB5D4;
+  --accent-hover:#1E9FBB;
+  --accent-dim:rgba(42,181,212,0.1);
+  --navy:#1B3F6E;
+  --navy-dim:rgba(27,63,110,0.08);
+  --green:#16a34a;
+  --green-dim:rgba(22,163,74,0.1);
+  --yellow:#d97706;
+  --yellow-dim:rgba(217,119,6,0.1);
+  --red:#dc2626;
+  --red-dim:rgba(220,38,38,0.08);
+  --pink:#2AB5D4;
+  --pink-dim:rgba(42,181,212,0.08);
+  --blue:#1B6FA8;
+  --blue-dim:rgba(27,111,168,0.1);
+  --text:#0F1F35;
+  --text2:#4A6880;
+  --text3:#8AAABB;
+  --radius:12px;
+  --radius-sm:8px;
+  --shadow:0 2px 16px rgba(27,63,110,0.1);
+  /* Brand gradient: dark navy → teal (matches logo) */
+  --brand-gradient:linear-gradient(135deg,#1B3F6E,#2AB5D4);
+  --brand-glow:0 6px 24px rgba(42,181,212,0.25);
+}
+
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+
+/* ─── SCROLLBAR ─── */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
+
+/* ─── SCREENS ─── */
+.screen{display:none;min-height:100vh}
+.screen.active{display:flex}
+
+/* ══════════════════════════════════════
+   SETUP SCREEN
+══════════════════════════════════════ */
+#setupScreen{
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-start;
+  padding:40px 20px 60px;
+  background:radial-gradient(ellipse at 50% 0%, rgba(42,181,212,0.12) 0%, rgba(27,63,110,0.04) 40%, transparent 70%);
+}
+
+.setup-header{text-align:center;margin-bottom:40px}
+.setup-logo{
+  width:64px;height:64px;
+  background:var(--brand-gradient);
+  border-radius:18px;
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 18px;
+  box-shadow:var(--brand-glow);
+  border:1px solid rgba(42,181,212,0.2);
+}
+.setup-logo svg{width:38px;height:38px;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.3))}
+.setup-title{font-size:1.9rem;font-weight:800;letter-spacing:-0.5px;margin-bottom:6px}
+.setup-title span{background:var(--brand-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.setup-sub{color:var(--text2);font-size:0.95rem}
+
+.setup-card{
+  width:100%;max-width:680px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:32px;
+  margin-bottom:16px;
+  box-shadow:var(--shadow);
+  backdrop-filter:blur(4px);
+}
+.setup-card:hover{border-color:var(--border2);transition:border-color 0.3s}
+.setup-card-title{
+  font-size:0.7rem;text-transform:uppercase;letter-spacing:1.5px;
+  color:var(--accent);font-weight:700;margin-bottom:20px;
+  display:flex;align-items:center;gap:8px;
+  border-bottom:1px solid var(--border);padding-bottom:14px;
+}
+.setup-card-title::after{content:'';flex:1;height:1px;background:var(--border)}
+
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.form-row.full{grid-template-columns:1fr}
+.form-group{display:flex;flex-direction:column;gap:6px}
+.form-label{font-size:0.78rem;color:var(--text2);font-weight:500}
+.form-label span{color:var(--red);margin-left:2px}
+
+.form-input,.form-textarea,.form-select{
+  background:var(--surface2);
+  border:1px solid var(--border);
+  border-radius:var(--radius-sm);
+  color:var(--text);
+  font-size:0.875rem;
+  font-family:inherit;
+  padding:10px 14px;
+  outline:none;
+  transition:border-color 0.2s,box-shadow 0.2s;
+  width:100%;
+}
+.form-input:focus,.form-textarea:focus,.form-select:focus{
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px rgba(99,102,241,0.1);
+}
+.form-input::placeholder,.form-textarea::placeholder{color:var(--text3)}
+.form-textarea{resize:vertical;min-height:110px;line-height:1.5}
+.form-select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394a3b8' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+.form-select option{background:var(--surface2)}
+
+/* Type selector */
+.type-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.type-option{
+  border:1px solid var(--border);
+  border-radius:var(--radius-sm);
+  padding:12px 14px;
+  cursor:pointer;
+  transition:all 0.2s;
+  display:flex;align-items:center;gap:10px;
+}
+.type-option:hover{border-color:var(--accent);background:var(--accent-dim)}
+.type-option.selected{border-color:var(--accent);background:var(--accent-dim)}
+.type-option input{display:none}
+.type-icon{font-size:1.1rem}
+.type-text{font-size:0.82rem;font-weight:500}
+
+/* Tone selector */
+.tone-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.tone-option{
+  border:1px solid var(--border);
+  border-radius:var(--radius-sm);
+  padding:10px 8px;
+  cursor:pointer;
+  transition:all 0.2s;
+  text-align:center;
+  font-size:0.78rem;font-weight:500;
+}
+.tone-option:hover{border-color:var(--accent);background:var(--accent-dim);color:var(--accent)}
+.tone-option.selected{border-color:var(--accent);background:var(--accent-dim);color:var(--accent)}
+.tone-option input{display:none}
+
+/* API key field */
+.api-key-wrap{position:relative}
+.api-key-wrap .form-input{padding-right:80px;font-family:monospace;letter-spacing:1px}
+.api-key-toggle{
+  position:absolute;right:10px;top:50%;transform:translateY(-50%);
+  background:var(--surface3);border:1px solid var(--border);
+  border-radius:6px;color:var(--text2);font-size:0.72rem;
+  padding:4px 10px;cursor:pointer;transition:all 0.15s;
+}
+.api-key-toggle:hover{color:var(--text);border-color:var(--accent)}
+
+.api-notice{
+  display:flex;gap:10px;align-items:flex-start;
+  background:var(--blue-dim);border:1px solid rgba(59,130,246,0.2);
+  border-radius:var(--radius-sm);padding:12px 14px;margin-top:10px;
+  font-size:0.78rem;color:var(--text2);line-height:1.5;
+}
+.api-notice-icon{font-size:1rem;flex-shrink:0;margin-top:1px}
+
+/* Progress & start */
+.setup-progress{
+  width:100%;max-width:680px;
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:16px;
+  font-size:0.78rem;color:var(--text2);
+}
+.progress-bar{flex:1;height:4px;background:var(--border);border-radius:2px;margin:0 12px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--pink));border-radius:2px;transition:width 0.3s}
+
+.start-btn{
+  width:100%;max-width:680px;
+  padding:16px;border-radius:var(--radius);border:none;
+  background:var(--brand-gradient);
+  color:white;font-size:1rem;font-weight:700;
+  cursor:pointer;transition:all 0.2s;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  letter-spacing:0.3px;
+}
+.start-btn:hover{transform:translateY(-2px);box-shadow:var(--brand-glow)}
+.start-btn:active{transform:translateY(0)}
+.start-btn:disabled{opacity:0.4;cursor:not-allowed;transform:none;box-shadow:none}
+
+/* Validation */
+.field-error{font-size:0.72rem;color:var(--red);margin-top:2px;display:none}
+.form-input.error,.form-textarea.error,.form-select.error{border-color:var(--red)}
+
+
+/* ══════════════════════════════════════
+   INTERVIEW SCREEN
+══════════════════════════════════════ */
+#interviewScreen{flex-direction:column}
+
+/* Top bar */
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 20px;
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  position:sticky;top:0;z-index:100;
+  box-shadow:0 1px 0 rgba(42,181,212,0.08);
+}
+.topbar-left{display:flex;align-items:center;gap:12px}
+.topbar-logo{
+  width:32px;height:32px;
+  background:var(--brand-gradient);
+  border-radius:9px;display:flex;align-items:center;justify-content:center;
+  border:1px solid rgba(42,181,212,0.25);
+  box-shadow:0 2px 8px rgba(42,181,212,0.2);
+}
+.topbar-name{font-size:0.9rem;font-weight:700}
+.topbar-meta{font-size:0.75rem;color:var(--text2)}
+
+.topbar-right{display:flex;align-items:center;gap:8px}
+
+.status-dot{
+  width:8px;height:8px;border-radius:50%;
+  background:var(--text3);transition:background 0.3s;
+}
+.status-dot.listening{background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse-dot 1.5s ease-in-out infinite}
+.status-dot.offline{background:var(--yellow)}
+@keyframes pulse-dot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(0.7)}}
+
+.status-label{font-size:0.72rem;color:var(--text2)}
+
+.tb-btn{
+  background:var(--surface2);border:1px solid var(--border);
+  color:var(--text2);padding:6px 12px;border-radius:var(--radius-sm);
+  cursor:pointer;font-size:0.75rem;font-weight:500;transition:all 0.15s;
+}
+.tb-btn:hover{border-color:var(--accent);color:var(--text)}
+.tb-btn.active{background:var(--accent-dim);border-color:var(--accent);color:var(--accent)}
+
+/* Interview body */
+.interview-body{
+  display:grid;
+  grid-template-columns:300px 1fr;
+  flex:1;
+  height:calc(100vh - 57px);
+  overflow:hidden;
+}
+
+/* ── LEFT PANEL ── */
+.left-panel{
+  display:flex;flex-direction:column;
+  border-right:1px solid var(--border);
+  background:var(--surface);
+  overflow-y:auto;
+}
+
+.panel-section{
+  padding:16px;
+  border-bottom:1px solid var(--border);
+}
+.panel-label{
+  font-size:0.65rem;text-transform:uppercase;letter-spacing:1.5px;
+  color:var(--text3);font-weight:700;margin-bottom:10px;
+}
+
+/* Mic button */
+.mic-btn{
+  width:100%;padding:13px;border-radius:var(--radius-sm);border:none;
+  font-size:0.875rem;font-weight:600;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  transition:all 0.2s;
+}
+.mic-btn.start{
+  background:var(--brand-gradient);color:white;
+  border:1px solid rgba(42,181,212,0.3);
+}
+.mic-btn.start:hover{opacity:0.9;box-shadow:var(--brand-glow)}
+.mic-btn.stop{background:var(--red-dim);border:1px solid rgba(239,68,68,0.3);color:var(--red)}
+.mic-btn.stop:hover{background:rgba(239,68,68,0.2)}
+
+.mic-hint{font-size:0.7rem;color:var(--text3);text-align:center;margin-top:6px}
+.kb-hint{font-size:0.68rem;color:var(--text3);background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:2px 6px;display:inline-block}
+
+/* Transcript box */
+.transcript-box{
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:var(--radius-sm);padding:12px;
+  min-height:90px;max-height:140px;overflow-y:auto;
+  font-size:0.82rem;line-height:1.6;color:var(--text);
+}
+.transcript-placeholder{color:var(--text3);font-style:italic;font-size:0.8rem}
+.transcript-interim{color:var(--text3);font-style:italic}
+
+/* Manual input */
+.manual-textarea{
+  width:100%;background:var(--surface2);border:1px solid var(--border);
+  border-radius:var(--radius-sm);color:var(--text);
+  padding:9px 12px;font-size:0.8rem;font-family:inherit;
+  resize:none;height:68px;outline:none;transition:border-color 0.2s;
+  line-height:1.5;
+}
+.manual-textarea:focus{border-color:var(--accent)}
+.manual-textarea::placeholder{color:var(--text3)}
+.manual-row{display:flex;gap:6px;margin-top:6px}
+.btn-xs{
+  flex:1;padding:7px;border-radius:6px;font-size:0.75rem;
+  cursor:pointer;font-weight:600;transition:all 0.15s;border:none;
+}
+.btn-primary{background:var(--brand-gradient);color:white;border:none}
+.btn-primary:hover{opacity:0.9;box-shadow:0 2px 12px rgba(42,181,212,0.3)}
+.btn-ghost{background:var(--surface2);color:var(--text2);border:1px solid var(--border)}
+.btn-ghost:hover{color:var(--text);border-color:var(--accent)}
+
+/* Timer */
+.timer-display{
+  background:var(--surface2);border-radius:var(--radius-sm);
+  border:1px solid var(--border);padding:12px;text-align:center;
+}
+.timer-value{
+  font-size:2rem;font-weight:800;font-variant-numeric:tabular-nums;
+  letter-spacing:-1px;color:var(--text);line-height:1;
+}
+.timer-value.warn{color:var(--yellow)}
+.timer-value.danger{color:var(--red)}
+.timer-sub{font-size:0.65rem;color:var(--text3);margin-top:2px;text-transform:uppercase;letter-spacing:1px}
+.timer-btns{display:flex;gap:6px;margin-top:8px}
+
+/* History */
+.history-list{display:flex;flex-direction:column;gap:4px;max-height:160px;overflow-y:auto}
+.history-item{
+  padding:8px 10px;border-radius:6px;font-size:0.75rem;
+  cursor:pointer;transition:all 0.15s;border-left:2px solid transparent;
+  color:var(--text2);line-height:1.4;
+}
+.history-item:hover{background:var(--surface2);color:var(--text)}
+.history-item.behavioral{border-left-color:var(--yellow)}
+.history-item.technical{border-left-color:var(--accent)}
+.history-item.pm{border-left-color:var(--navy)}
+.history-item.general{border-left-color:var(--text3)}
+.history-empty{font-size:0.75rem;color:var(--text3);font-style:italic}
+
+/* Session info card */
+.session-info{
+  background:var(--surface2);border-radius:var(--radius-sm);
+  border:1px solid var(--border);padding:10px 12px;
+  font-size:0.75rem;display:flex;flex-direction:column;gap:4px;
+}
+.si-row{display:flex;justify-content:space-between;align-items:center}
+.si-label{color:var(--text3)}
+.si-val{color:var(--text);font-weight:500;text-align:right;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ── RIGHT PANEL ── */
+.right-panel{
+  display:flex;flex-direction:column;
+  background:var(--bg);
+  overflow-y:auto;
+  padding:20px;
+  gap:16px;
+}
+
+/* Empty state */
+.empty-state{
+  flex:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  gap:12px;text-align:center;padding:60px 40px;
+  color:var(--text3);
+}
+.empty-icon{font-size:3rem;opacity:0.3;margin-bottom:4px}
+.empty-title{font-size:1rem;font-weight:600;color:var(--text2)}
+.empty-sub{font-size:0.82rem;line-height:1.6;max-width:300px}
+.empty-shortcuts{
+  display:flex;flex-direction:column;gap:6px;margin-top:8px;
+  font-size:0.75rem;color:var(--text3);
+}
+.shortcut-row{display:flex;align-items:center;gap:8px;justify-content:center}
+.kbd{
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:4px;padding:2px 8px;font-family:monospace;font-size:0.7rem;
+}
+
+/* Answer card */
+.answer-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);overflow:hidden;
+}
+.answer-card-header{
+  padding:14px 18px;
+  display:flex;align-items:flex-start;justify-content:space-between;gap:12px;
+  border-bottom:1px solid var(--border);
+}
+.detected-q{font-size:0.95rem;font-weight:600;line-height:1.5;flex:1;color:var(--text)}
+.q-type-badge{
+  flex-shrink:0;padding:4px 10px;border-radius:20px;
+  font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;
+  margin-top:2px;
+}
+.qb-behavioral{background:var(--yellow-dim);color:var(--yellow);border:1px solid rgba(245,158,11,0.25)}
+.qb-technical{background:var(--accent-dim);color:var(--accent);border:1px solid rgba(42,181,212,0.25)}
+.qb-pm{background:var(--navy-dim);color:var(--accent);border:1px solid rgba(27,72,117,0.4)}
+.qb-general{background:var(--surface2);color:var(--text2);border:1px solid var(--border)}
+
+.answer-card-body{padding:18px}
+
+/* Framework */
+.framework-label{
+  font-size:0.65rem;text-transform:uppercase;letter-spacing:1.5px;
+  font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:6px;
+}
+.fl-behavioral{color:var(--yellow)}
+.fl-technical{color:var(--accent)}
+.fl-pm{color:var(--accent)}
+.fl-general{color:var(--text2)}
+
+.steps-list{display:flex;flex-direction:column;gap:10px;margin-bottom:16px}
+.step-row{display:flex;gap:12px;align-items:flex-start}
+.step-num{
+  width:22px;height:22px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:0.65rem;font-weight:800;flex-shrink:0;margin-top:1px;
+}
+.sn-behavioral{background:var(--yellow-dim);color:var(--yellow)}
+.sn-technical{background:var(--accent-dim);color:var(--accent)}
+.sn-pm{background:var(--navy-dim);color:var(--accent)}
+.sn-general{background:var(--surface2);color:var(--text2)}
+.step-body{}
+.step-title{font-size:0.82rem;font-weight:600;color:var(--text);margin-bottom:2px}
+.step-detail{font-size:0.78rem;color:var(--text2);line-height:1.5}
+
+.divider{height:1px;background:var(--border);margin:14px 0}
+
+/* Tips */
+.tips-label{font-size:0.65rem;text-transform:uppercase;letter-spacing:1.5px;font-weight:700;color:var(--text3);margin-bottom:10px}
+.tip-item{
+  display:flex;gap:10px;padding:10px 12px;
+  background:var(--surface2);border-radius:var(--radius-sm);
+  border:1px solid var(--border);margin-bottom:8px;
+  font-size:0.8rem;line-height:1.5;color:var(--text2);
+  cursor:pointer;transition:all 0.15s;
+}
+.tip-item:hover{border-color:var(--accent);color:var(--text);background:var(--accent-dim)}
+.tip-bullet{color:var(--accent);flex-shrink:0;font-weight:700;font-size:1rem}
+
+/* Competency badge */
+.competency-row{
+  display:flex;align-items:center;gap:8px;
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:8px;
+}
+.competency-label{font-size:0.7rem;color:var(--text3);text-transform:uppercase;letter-spacing:1px;font-weight:700}
+.competency-val{font-size:0.8rem;color:var(--text);font-weight:500}
+
+/* AI loading/placeholder */
+.ai-placeholder{
+  background:var(--surface2);border:1px solid rgba(42,181,212,0.2);
+  border-radius:var(--radius-sm);padding:14px 16px;
+  font-size:0.8rem;color:var(--accent);
+  display:flex;align-items:center;gap:10px;margin-top:8px;
+}
+.ai-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse-dot 1.2s ease-in-out infinite}
+
+/* AI Answer box (replaces placeholder once Claude responds) */
+.ai-answer-box{
+  background:linear-gradient(135deg,rgba(27,63,110,0.04),rgba(42,181,212,0.06));
+  border:1px solid rgba(42,181,212,0.3);
+  border-radius:var(--radius-sm);
+  padding:16px 18px;margin-top:8px;
+  position:relative;overflow:hidden;
+  animation:fade-in 0.4s ease;
+}
+.ai-answer-box::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:var(--brand-gradient);
+}
+@keyframes fade-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* Trap warning */
+.trap-warning{
+  display:flex;align-items:center;gap:10px;
+  background:var(--yellow-dim);border:1px solid rgba(245,158,11,0.25);
+  border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:12px;
+  font-size:0.8rem;color:var(--yellow);font-weight:500;
+}
+
+/* ── MODALS / OVERLAYS ── */
+.modal-overlay{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);
+  z-index:200;align-items:center;justify-content:center;
+}
+.modal-overlay.open{display:flex}
+.modal{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:16px;padding:28px;max-width:460px;width:90%;
+  box-shadow:var(--shadow);
+}
+.modal-title{font-size:1rem;font-weight:700;margin-bottom:6px}
+.modal-sub{font-size:0.82rem;color:var(--text2);margin-bottom:20px;line-height:1.5}
+.modal-actions{display:flex;gap:10px;margin-top:20px}
+.btn-modal-primary{flex:1;padding:11px;border-radius:var(--radius-sm);border:none;background:var(--brand-gradient);color:white;font-size:0.875rem;font-weight:600;cursor:pointer}
+.btn-modal-ghost{flex:1;padding:11px;border-radius:var(--radius-sm);background:transparent;border:1px solid var(--border);color:var(--text2);font-size:0.875rem;cursor:pointer}
+.btn-modal-ghost:hover{border-color:var(--accent);color:var(--text)}
+
+/* ══════════════════════════════════════
+   RIGHT PANEL TABS  (Session 3)
+══════════════════════════════════════ */
+.right-panel{display:flex;flex-direction:column;background:var(--bg);overflow:hidden;padding:0}
+
+.panel-tabs{
+  display:flex;align-items:center;
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  padding:0 16px;
+  gap:4px;flex-shrink:0;
+}
+.panel-tab{
+  padding:12px 16px;font-size:0.8rem;font-weight:600;
+  color:var(--text2);cursor:pointer;border:none;background:none;
+  border-bottom:2px solid transparent;transition:all 0.15s;
+  display:flex;align-items:center;gap:6px;
+}
+.panel-tab:hover{color:var(--text)}
+.panel-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab-badge{
+  background:var(--red);color:white;
+  border-radius:10px;padding:1px 6px;
+  font-size:0.6rem;font-weight:700;
+}
+
+.tab-content{display:none;flex:1;overflow-y:auto;padding:20px;gap:16px;flex-direction:column}
+.tab-content.active{display:flex}
+
+/* ══════════════════════════════════════
+   COACHING PANEL  (Session 3)
+══════════════════════════════════════ */
+
+/* Filler word tracker */
+.coaching-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);padding:16px 18px;
+}
+.coaching-card-title{
+  font-size:0.65rem;text-transform:uppercase;letter-spacing:1.5px;
+  font-weight:700;color:var(--text3);margin-bottom:12px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.coaching-card-title span{color:var(--text3)}
+
+.filler-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.filler-item{
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:var(--radius-sm);padding:10px 8px;text-align:center;
+  transition:all 0.2s;
+}
+.filler-item.triggered{background:var(--yellow-dim);border-color:rgba(217,119,6,0.3)}
+.filler-item.danger{background:var(--red-dim);border-color:rgba(220,38,38,0.2)}
+.filler-word{font-size:0.75rem;font-weight:600;color:var(--text2)}
+.filler-count{font-size:1.3rem;font-weight:800;color:var(--text);line-height:1.2}
+.filler-item.triggered .filler-count{color:var(--yellow)}
+.filler-item.danger .filler-count{color:var(--red)}
+
+/* Pace meter */
+.pace-bar-wrap{
+  background:var(--surface2);border-radius:20px;height:10px;
+  position:relative;overflow:hidden;border:1px solid var(--border);
+  margin:8px 0;
+}
+.pace-bar-fill{
+  height:100%;border-radius:20px;transition:width 0.5s ease,background 0.3s;
+  background:var(--green);
+}
+.pace-labels{display:flex;justify-content:space-between;font-size:0.65rem;color:var(--text3);margin-top:4px}
+.pace-status{font-size:0.82rem;font-weight:600;text-align:center;margin-top:6px}
+.pace-status.slow{color:var(--blue)}
+.pace-status.good{color:var(--green)}
+.pace-status.fast{color:var(--yellow)}
+.pace-status.very-fast{color:var(--red)}
+
+/* Silence nudge */
+.silence-bar{
+  display:flex;align-items:center;gap:10px;
+  background:var(--surface2);border-radius:var(--radius-sm);
+  border:1px solid var(--border);padding:10px 14px;
+  font-size:0.8rem;color:var(--text2);transition:all 0.3s;
+}
+.silence-bar.warning{background:var(--yellow-dim);border-color:rgba(217,119,6,0.3);color:var(--yellow)}
+.silence-meter{flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+.silence-fill{height:100%;background:var(--green);border-radius:3px;transition:width 0.5s,background 0.3s}
+
+/* Story bank */
+.story-empty{font-size:0.8rem;color:var(--text3);text-align:center;padding:20px;font-style:italic}
+.story-item{
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:var(--radius-sm);padding:12px 14px;
+  transition:all 0.15s;
+}
+.story-item:hover{border-color:var(--accent)}
+.story-header{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.story-tag{
+  font-size:0.62rem;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;
+  padding:2px 8px;border-radius:10px;
+}
+.st-leadership{background:var(--navy-dim);color:var(--navy)}
+.st-achievement{background:var(--green-dim);color:var(--green)}
+.st-failure{background:var(--red-dim);color:var(--red)}
+.st-conflict{background:var(--yellow-dim);color:var(--yellow)}
+.st-teamwork{background:var(--accent-dim);color:var(--accent)}
+.st-general{background:var(--surface3);color:var(--text2)}
+.story-title{font-size:0.82rem;font-weight:600;color:var(--text);flex:1}
+.story-preview{font-size:0.75rem;color:var(--text2);line-height:1.5;margin-bottom:8px}
+.story-actions{display:flex;gap:6px}
+.story-use-btn{
+  flex:1;padding:6px;border-radius:6px;font-size:0.72rem;font-weight:600;
+  background:var(--brand-gradient);color:white;border:none;cursor:pointer;
+}
+.story-del-btn{
+  padding:6px 10px;border-radius:6px;font-size:0.72rem;
+  background:var(--surface3);border:1px solid var(--border);color:var(--text2);cursor:pointer;
+}
+.story-del-btn:hover{border-color:var(--red);color:var(--red)}
+
+.add-story-form{
+  background:var(--surface2);border:1px dashed var(--border2);
+  border-radius:var(--radius-sm);padding:14px;
+}
+.add-story-form textarea{
+  width:100%;background:var(--surface);border:1px solid var(--border);
+  border-radius:6px;padding:8px 10px;font-size:0.8rem;font-family:inherit;
+  color:var(--text);resize:none;height:72px;outline:none;line-height:1.5;
+}
+.add-story-form textarea:focus{border-color:var(--accent)}
+.add-story-form select{
+  width:100%;background:var(--surface);border:1px solid var(--border);
+  border-radius:6px;padding:8px 10px;font-size:0.8rem;color:var(--text);
+  outline:none;margin:6px 0;cursor:pointer;
+}
+.add-story-title-input{
+  width:100%;background:var(--surface);border:1px solid var(--border);
+  border-radius:6px;padding:8px 10px;font-size:0.8rem;color:var(--text);
+  outline:none;margin-bottom:6px;font-family:inherit;
+}
+.add-story-title-input:focus,.add-story-form select:focus{border-color:var(--accent)}
+
+/* coaching stats row */
+.stats-row{display:flex;gap:8px;margin-bottom:4px}
+.stat-box{
+  flex:1;background:var(--surface2);border:1px solid var(--border);
+  border-radius:var(--radius-sm);padding:10px;text-align:center;
+}
+.stat-val{font-size:1.4rem;font-weight:800;color:var(--text);line-height:1}
+.stat-lbl{font-size:0.62rem;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;margin-top:3px}
+
+/* ── TOAST ── */
+.toast-container{position:fixed;bottom:20px;right:20px;z-index:300;display:flex;flex-direction:column;gap:8px}
+.toast{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-sm);padding:10px 16px;
+  font-size:0.8rem;color:var(--text);
+  box-shadow:var(--shadow);
+  animation:slide-in 0.2s ease;
+  display:flex;align-items:center;gap:8px;
+}
+.toast.success{border-left:3px solid var(--green)}
+.toast.error{border-left:3px solid var(--red)}
+.toast.info{border-left:3px solid var(--accent)}
+@keyframes slide-in{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  .interview-body{grid-template-columns:1fr;grid-template-rows:auto 1fr}
+  .left-panel{border-right:none;border-bottom:1px solid var(--border);max-height:300px}
+  .form-row{grid-template-columns:1fr}
+  .tone-grid{grid-template-columns:repeat(2,1fr)}
+}
+
+/* ── SESSION 6: POST-INTERVIEW ANALYTICS ── */
+#analyticsScreen{flex-direction:column;background:var(--bg);overflow:hidden}
+.analytics-topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0}
+.analytics-topbar-left{display:flex;align-items:center;gap:10px}
+.analytics-badge{background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;font-size:0.7rem;font-weight:700;padding:3px 9px;border-radius:12px;letter-spacing:0.5px}
+.analytics-title{font-size:0.9rem;font-weight:600;color:var(--text)}
+.analytics-meta{font-size:0.72rem;color:var(--text3);margin-top:1px}
+.analytics-topbar-right{display:flex;gap:8px;align-items:center}
+.btn-analytics{padding:6px 14px;border-radius:8px;font-size:0.78rem;cursor:pointer;font-family:inherit;transition:all .2s;font-weight:600}
+.btn-analytics.primary{background:linear-gradient(135deg,var(--accent),#1a8fa8);border:none;color:#0a0f1e}
+.btn-analytics.ghost{background:transparent;border:1px solid var(--border);color:var(--text2)}
+.btn-analytics.ghost:hover{border-color:var(--accent);color:var(--accent)}
+.btn-analytics.danger{background:transparent;border:1px solid #ef4444;color:#ef4444}
+.btn-analytics.danger:hover{background:#ef4444;color:#fff}
+.analytics-body{flex:1;overflow-y:auto;padding:20px 24px;display:flex;flex-direction:column;gap:20px}
+.analytics-stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.analytics-stat{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 16px;text-align:center}
+.analytics-stat-val{font-size:1.6rem;font-weight:700;color:var(--accent);line-height:1}
+.analytics-stat-lbl{font-size:0.7rem;color:var(--text3);text-transform:uppercase;letter-spacing:0.6px;margin-top:4px}
+.analytics-section{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.analytics-section-title{padding:12px 16px;border-bottom:1px solid var(--border);font-size:0.78rem;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px}
+.analytics-filler-grid{display:flex;flex-wrap:wrap;gap:8px;padding:14px 16px}
+.analytics-filler-chip{padding:5px 12px;background:var(--surface);border:1px solid var(--border);border-radius:20px;font-size:0.78rem;color:var(--text2)}
+.analytics-filler-chip.warn{border-color:#f59e0b;color:#f59e0b}
+.analytics-filler-chip.bad{border-color:#ef4444;color:#ef4444}
+.analytics-qa-list{display:flex;flex-direction:column}
+.analytics-qa-item{padding:16px;border-bottom:1px solid var(--border)}
+.analytics-qa-item:last-child{border-bottom:none}
+.analytics-q-num{font-size:0.65rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:4px}
+.analytics-q-text{font-size:0.85rem;color:var(--text);font-weight:500;margin-bottom:8px;line-height:1.5}
+.analytics-a-text{font-size:0.82rem;color:var(--text2);line-height:1.65;padding:10px 12px;background:var(--surface);border-radius:8px;border-left:3px solid rgba(42,181,212,0.4)}
+.analytics-a-none{font-size:0.78rem;color:var(--text3);font-style:italic;padding:6px 0}
+.analytics-export-row{display:flex;gap:10px;padding:14px 16px}
+.analytics-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:12px;color:var(--text3);text-align:center;padding:60px}
+.analytics-empty-icon{font-size:2.5rem}
+
+/* ── PRINT STYLES (PDF export) ── */
+@media print{
+  body{background:#fff !important}
+  .screen{display:none !important}
+  #analyticsScreen{display:block !important;overflow:visible !important}
+  .analytics-topbar-right,.analytics-export-row,.btn-analytics{display:none !important}
+  .analytics-body{overflow:visible !important;padding:0 !important}
+  .analytics-section,.analytics-stat,.analytics-topbar{border-color:#ddd !important;background:#fff !important}
+  .analytics-stat-val{color:#0a8fa8 !important}
+  .analytics-q-text{color:#111 !important}
+  .analytics-a-text{color:#333 !important;background:#f8f8f8 !important;border-left-color:#0a8fa8 !important}
+  .analytics-badge{background:#0a8fa8 !important}
+  .analytics-filler-chip{border-color:#999 !important;color:#555 !important}
+  .analytics-filler-chip.warn{border-color:#d97706 !important;color:#d97706 !important}
+  .analytics-filler-chip.bad{border-color:#ef4444 !important;color:#ef4444 !important}
+}
+
+/* ── SESSION 5: MOCK INTERVIEW MODE ── */
+#mockScreen{flex-direction:column;background:var(--bg);overflow:hidden}
+.mock-topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0}
+.mock-topbar-left{display:flex;align-items:center;gap:12px}
+.mock-badge{background:linear-gradient(135deg,#a855f7,#7c3aed);color:#fff;font-size:0.7rem;font-weight:700;padding:3px 9px;border-radius:12px;letter-spacing:0.5px}
+.mock-title{font-size:0.9rem;font-weight:600;color:var(--text)}
+.mock-meta{font-size:0.75rem;color:var(--text3);margin-top:1px}
+.mock-q-counter{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:0.75rem;color:var(--text2)}
+.mock-topbar-right{display:flex;align-items:center;gap:10px}
+.mock-end-btn{padding:6px 14px;background:transparent;border:1px solid #ef4444;color:#ef4444;border-radius:8px;font-size:0.78rem;cursor:pointer;font-family:inherit;transition:all .2s}
+.mock-end-btn:hover{background:#ef4444;color:#fff}
+.mock-body{display:flex;flex-direction:column;flex:1;overflow:hidden}
+.mock-chat{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:14px;scroll-behavior:smooth}
+.mock-bubble{max-width:78%;padding:12px 16px;border-radius:14px;font-size:0.85rem;line-height:1.65;animation:fadeIn .3s ease}
+.mock-bubble.interviewer{align-self:flex-start;background:var(--card);border:1px solid rgba(42,181,212,0.25);border-bottom-left-radius:4px}
+.mock-bubble.interviewer .bubble-label{font-size:0.68rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:5px}
+.mock-bubble.candidate{align-self:flex-end;background:linear-gradient(135deg,rgba(42,181,212,0.15),rgba(42,181,212,0.08));border:1px solid rgba(42,181,212,0.2);border-bottom-right-radius:4px}
+.mock-bubble.candidate .bubble-label{font-size:0.68rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:5px;text-align:right}
+.mock-bubble.thinking{align-self:flex-start;background:var(--card);border:1px solid var(--border);opacity:0.7}
+.mock-bubble p{margin:0;color:var(--text)}
+.mock-input-bar{flex-shrink:0;padding:16px 20px;border-top:1px solid var(--border);background:var(--surface);display:flex;align-items:center;gap:14px}
+.mock-mic-btn{width:52px;height:52px;border-radius:50%;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.3rem;transition:all .2s;flex-shrink:0}
+.mock-mic-btn.idle{background:var(--card);border:2px solid var(--border)}
+.mock-mic-btn.listening{background:linear-gradient(135deg,var(--accent),#1a8fa8);box-shadow:0 0 0 6px rgba(42,181,212,0.2);animation:pulse 1.5s ease-in-out infinite}
+.mock-mic-btn.processing{background:linear-gradient(135deg,#a855f7,#7c3aed);box-shadow:0 0 0 6px rgba(168,85,247,0.2)}
+.mock-live-text{flex:1;min-height:44px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 14px;font-size:0.82rem;color:var(--text2);line-height:1.5;display:flex;align-items:center}
+.mock-status-line{font-size:0.75rem;color:var(--text3);text-align:center;margin-top:4px}
+.mock-start-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:16px;padding:40px}
+.mock-start-icon{font-size:3rem}
+.mock-start-title{font-size:1.2rem;font-weight:700;color:var(--text);text-align:center}
+.mock-start-sub{font-size:0.85rem;color:var(--text2);text-align:center;max-width:380px;line-height:1.6}
+.mock-start-btn{padding:12px 28px;background:linear-gradient(135deg,var(--accent),#1a8fa8);border:none;border-radius:10px;color:#0a0f1e;font-weight:700;font-size:0.9rem;cursor:pointer;font-family:inherit;transition:opacity .2s}
+.mock-start-btn:hover{opacity:0.88}
+
+/* ── SESSION 4: CODE TAB ── */
+.code-panel{display:flex;flex-direction:column;gap:10px;padding:14px;height:100%;box-sizing:border-box;overflow-y:auto}
+.code-lang-group{display:flex;gap:6px;flex-wrap:wrap}
+.lang-btn{padding:5px 12px;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--text2);font-size:0.75rem;cursor:pointer;transition:all .2s;font-family:inherit;letter-spacing:0.3px}
+.lang-btn:hover{border-color:var(--accent);color:var(--accent)}
+.lang-btn.active{background:var(--accent);border-color:var(--accent);color:#0a0f1e;font-weight:600}
+.code-question-input{width:100%;padding:10px 12px;background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:0.82rem;resize:vertical;min-height:72px;font-family:inherit;line-height:1.5;box-sizing:border-box;transition:border-color .2s}
+.code-question-input:focus{outline:none;border-color:var(--accent)}
+.code-question-input::placeholder{color:var(--text3)}
+.code-submit-btn{width:100%;padding:10px;background:linear-gradient(135deg,var(--accent),#1a8fa8);border:none;border-radius:8px;color:#0a0f1e;font-weight:700;font-size:0.85rem;cursor:pointer;letter-spacing:0.5px;transition:opacity .2s;font-family:inherit}
+.code-submit-btn:hover{opacity:0.88}
+.code-submit-btn:disabled{opacity:0.4;cursor:default}
+.code-output-area{flex:1;min-height:0}
+.code-answer-box{background:var(--card);border:1px solid rgba(42,181,212,0.2);border-radius:10px;overflow:hidden}
+.code-answer-header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid rgba(42,181,212,0.15)}
+.code-answer-lang-badge{font-size:0.7rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:1px}
+.code-copy-btn{padding:4px 10px;background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--text2);font-size:0.72rem;cursor:pointer;font-family:inherit;transition:all .2s}
+.code-copy-btn:hover{border-color:var(--accent);color:var(--accent)}
+.code-block{margin:0;padding:14px 16px;font-family:'SF Mono','Fira Code','Consolas',monospace;font-size:0.78rem;line-height:1.65;color:#e2e8f0;overflow-x:auto;white-space:pre;background:transparent}
+.code-kw{color:#2ab5d4}
+.code-str{color:#a8e6a3}
+.code-num{color:#f9c74f}
+.code-cmt{color:#64748b;font-style:italic}
+.code-fn{color:#c9a8f5}
+.code-explanation{padding:12px 14px;border-top:1px solid rgba(42,181,212,0.1);font-size:0.82rem;color:var(--text2);line-height:1.6}
+.code-tab-badge{display:inline-block;background:var(--accent);color:#0a0f1e;border-radius:10px;font-size:0.65rem;font-weight:700;padding:1px 6px;margin-left:5px;animation:pulse 1s ease-in-out 3}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     SETUP SCREEN
+══════════════════════════════════════ -->
+<div id="setupScreen" class="screen active">
+  <div class="setup-header">
+    <div class="setup-logo">
+      <svg viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M5 7L14.5 27L19 18L23.5 27L33 7" stroke="white" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M26 7L33 7L33 14" stroke="#7DE8F5" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="19" cy="18.5" r="2" fill="#7DE8F5"/>
+      </svg>
+    </div>
+    <h1 class="setup-title">Vignix <span>Ai Assist</span></h1>
+    <p class="setup-sub">Set up your session once. Get personalized guidance in every interview.</p>
+  </div>
+
+  <!-- Card 1: API Key (hidden once saved) -->
+  <div class="setup-card" id="apiKeyCard">
+    <div class="setup-card-title">🔑 AI Configuration</div>
+    <div class="form-row full">
+      <div class="form-group">
+        <label class="form-label">Claude API Key <span>*</span></label>
+        <div class="api-key-wrap">
+          <input type="password" id="apiKey" class="form-input" placeholder="sk-ant-api03-..." autocomplete="off"/>
+          <button class="api-key-toggle" onclick="toggleApiKey()">Show</button>
+        </div>
+        <div class="field-error" id="apiKeyError">API key is required for AI-powered answers</div>
+        <div class="api-notice">
+          <span class="api-notice-icon">ℹ️</span>
+          <span>Your key is stored only in your browser and never sent anywhere except Anthropic's API. Works offline without a key using built-in frameworks.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- API key saved indicator (shown when key is already saved) -->
+  <div id="apiKeySavedRow" style="display:none;width:100%;max-width:680px;margin-bottom:4px">
+    <div style="display:flex;align-items:center;justify-content:space-between;background:var(--green-dim);border:1px solid rgba(22,163,74,0.2);border-radius:var(--radius-sm);padding:10px 16px;font-size:0.8rem">
+      <span style="color:var(--green);font-weight:600">✅ Claude API key saved</span>
+      <button onclick="showApiKeyCard()" style="background:none;border:none;color:var(--text2);font-size:0.75rem;cursor:pointer;text-decoration:underline">Change key</button>
+    </div>
+  </div>
+
+  <!-- Card 2: Your Profile -->
+  <div class="setup-card">
+    <div class="setup-card-title">👤 Your Profile</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Your Name <span>*</span></label>
+        <input type="text" id="candidateName" class="form-input" placeholder="e.g. Ganesh Boya"/>
+        <div class="field-error" id="nameError">Please enter your name</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Target Company <span>*</span></label>
+        <input type="text" id="targetCompany" class="form-input" placeholder="e.g. Google, Amazon, Startup..."/>
+        <div class="field-error" id="companyError">Please enter the company name</div>
+      </div>
+    </div>
+    <div class="form-row full">
+      <div class="form-group">
+        <label class="form-label">Target Role <span>*</span></label>
+        <input type="text" id="targetRole" class="form-input" placeholder="e.g. Senior Software Engineer, Product Manager..."/>
+        <div class="field-error" id="roleError">Please enter the role</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card 3: Context -->
+  <div class="setup-card">
+    <div class="setup-card-title">📄 Interview Context</div>
+    <div class="form-row full">
+      <div class="form-group">
+        <label class="form-label">Your Resume <span>*</span></label>
+        <textarea id="resume" class="form-textarea" placeholder="Paste your resume text here. The AI will use this to give you personalized answers drawn from your actual experience..." style="min-height:130px"></textarea>
+        <div class="field-error" id="resumeError">Please paste your resume</div>
+      </div>
+    </div>
+    <div class="form-row full">
+      <div class="form-group">
+        <label class="form-label">Job Description <span>*</span></label>
+        <textarea id="jobDescription" class="form-textarea" placeholder="Paste the full job description here. The AI will tailor answers to match exactly what this company is looking for..." style="min-height:130px"></textarea>
+        <div class="field-error" id="jdError">Please paste the job description</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card 4: Interview Type -->
+  <div class="setup-card">
+    <div class="setup-card-title">🎯 Interview Type</div>
+    <div class="type-grid" id="typeGrid">
+      <label class="type-option selected" onclick="selectType(this,'mixed')">
+        <input type="radio" name="interviewType" value="mixed" checked/>
+        <span class="type-icon">🔀</span>
+        <div><div class="type-text">Mixed</div></div>
+      </label>
+      <label class="type-option" onclick="selectType(this,'engineering')">
+        <input type="radio" name="interviewType" value="engineering"/>
+        <span class="type-icon">⚙️</span>
+        <div><div class="type-text">Software Engineering</div></div>
+      </label>
+      <label class="type-option" onclick="selectType(this,'behavioral')">
+        <input type="radio" name="interviewType" value="behavioral"/>
+        <span class="type-icon">🧠</span>
+        <div><div class="type-text">Behavioral / HR</div></div>
+      </label>
+      <label class="type-option" onclick="selectType(this,'pm')">
+        <input type="radio" name="interviewType" value="pm"/>
+        <span class="type-icon">📊</span>
+        <div><div class="type-text">Product Management</div></div>
+      </label>
+    </div>
+  </div>
+
+  <!-- Card 5: Tone -->
+  <div class="setup-card">
+    <div class="setup-card-title">🎙 Answer Tone</div>
+    <div class="tone-grid" id="toneGrid">
+      <label class="tone-option selected" onclick="selectTone(this,'confident')">
+        <input type="radio" name="tone" value="confident" checked/>Confident
+      </label>
+      <label class="tone-option" onclick="selectTone(this,'humble')">
+        <input type="radio" name="tone" value="humble"/>Humble
+      </label>
+      <label class="tone-option" onclick="selectTone(this,'concise')">
+        <input type="radio" name="tone" value="concise"/>Concise
+      </label>
+      <label class="tone-option" onclick="selectTone(this,'detailed')">
+        <input type="radio" name="tone" value="detailed"/>Detailed
+      </label>
+    </div>
+  </div>
+
+  <!-- Card 6: Round & Context -->
+  <div class="setup-card">
+    <div class="setup-card-title">🎯 Interview Round & Context</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Interview Round</label>
+        <select id="interviewRound" class="form-select">
+          <option value="phone">📞 Phone Screen</option>
+          <option value="round1">1️⃣ Round 1 — First Interview</option>
+          <option value="round2">2️⃣ Round 2 — Second Interview</option>
+          <option value="round3">3️⃣ Round 3 — Third Interview</option>
+          <option value="final">🏁 Final Round</option>
+          <option value="panel">👥 Panel Interview</option>
+          <option value="hiring">⭐ Hiring Manager Round</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Interviewer Name / Role <span style="color:var(--text3);font-weight:400">(optional)</span></label>
+        <input type="text" id="interviewerInfo" class="form-input" placeholder="e.g. Sarah — Senior PM, or just 'hiring manager'"/>
+      </div>
+    </div>
+    <div class="form-row full">
+      <div class="form-group">
+        <label class="form-label">Additional Context <span style="color:var(--text3);font-weight:400">(optional)</span></label>
+        <textarea id="interviewContext" class="form-textarea" placeholder="Tell me anything that helps me give better answers — e.g:&#10;• This is a final round focused on leadership and strategy&#10;• In Round 1 I already used my Walmart data migration story&#10;• The team is focused on building a new analytics platform&#10;• Paste transcript from previous rounds here..." style="min-height:110px"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- Progress + Start -->
+  <div class="setup-progress">
+    <span id="progressLabel">Fill in required fields to continue</span>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+    <span id="progressPct">0%</span>
+  </div>
+
+  <button class="start-btn" id="startBtn" onclick="startInterview()" disabled>
+    🚀 Start Interview Session
+  </button>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     INTERVIEW SCREEN
+══════════════════════════════════════ -->
+<div id="interviewScreen" class="screen">
+
+  <!-- Top bar -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-logo">
+        <svg width="18" height="18" viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M5 7L14.5 27L19 18L23.5 27L33 7" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M26 7L33 7L33 14" stroke="#7DE8F5" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="19" cy="18.5" r="2.2" fill="#7DE8F5"/>
+        </svg>
+      </div>
+      <div>
+        <div class="topbar-name" id="tb-name">VIGNIX</div>
+        <div class="topbar-meta" id="tb-meta">Ready</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="status-dot" id="statusDot"></div>
+      <span class="status-label" id="statusLabel">Idle</span>
+      <button class="tb-btn" onclick="goToSetup()">⚙️ Setup</button>
+      <button class="tb-btn" id="stealthBtn" onclick="toggleStealth()">⚡ Stealth</button>
+      <button class="tb-btn" onclick="enterMockMode()" style="border-color:rgba(168,85,247,0.5);color:#c084fc">🎭 Mock</button>
+      <button class="tb-btn" onclick="clearSession()">🗑 Clear</button>
+    </div>
+  </div>
+
+  <!-- Body -->
+  <div class="interview-body">
+
+    <!-- ── LEFT PANEL ── -->
+    <div class="left-panel">
+
+      <!-- Session info -->
+      <div class="panel-section">
+        <div class="panel-label">Session</div>
+        <div class="session-info">
+          <div class="si-row"><span class="si-label">Candidate</span><span class="si-val" id="si-name">—</span></div>
+          <div class="si-row"><span class="si-label">Role</span><span class="si-val" id="si-role">—</span></div>
+          <div class="si-row"><span class="si-label">Company</span><span class="si-val" id="si-company">—</span></div>
+          <div class="si-row"><span class="si-label">Type</span><span class="si-val" id="si-type">—</span></div>
+        </div>
+      </div>
+
+      <!-- Microphone -->
+      <div class="panel-section">
+        <div class="panel-label">Microphone</div>
+        <button id="micBtn" class="mic-btn start" onclick="toggleMic()">🎙 Start Listening</button>
+        <div class="mic-hint">Press <span class="kb-hint">Ctrl+M</span> to toggle mic</div>
+      </div>
+
+      <!-- Transcript -->
+      <div class="panel-section">
+        <div class="panel-label">Live Transcript</div>
+        <div class="transcript-box" id="transcriptBox">
+          <span class="transcript-placeholder">Transcript appears here when mic is active...</span>
+        </div>
+      </div>
+
+      <!-- Manual input -->
+      <div class="panel-section">
+        <div class="panel-label">Type Question</div>
+        <textarea class="manual-textarea" id="manualInput" placeholder="Type or paste a question here..."></textarea>
+        <div class="manual-row">
+          <button class="btn-xs btn-primary" onclick="analyzeManual()">Analyze →</button>
+          <button class="btn-xs btn-ghost" onclick="document.getElementById('manualInput').value=''">Clear</button>
+        </div>
+      </div>
+
+      <!-- Timer -->
+      <div class="panel-section">
+        <div class="panel-label">Answer Timer</div>
+        <div class="timer-display">
+          <div class="timer-value" id="timerVal">0:00</div>
+          <div class="timer-sub">seconds elapsed</div>
+          <div class="timer-btns">
+            <button class="btn-xs btn-ghost" onclick="startTimer()" style="flex:1">▶ Start</button>
+            <button class="btn-xs btn-ghost" onclick="resetTimer()" style="flex:1">↺ Reset</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Question History -->
+      <div class="panel-section">
+        <div class="panel-label">Question History</div>
+        <div class="history-list" id="historyList">
+          <div class="history-empty">No questions yet</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── RIGHT PANEL ── -->
+    <div class="right-panel" id="rightPanel">
+
+      <!-- Tabs -->
+      <div class="panel-tabs">
+        <button class="panel-tab active" id="tabAnswerBtn" onclick="switchTab('answer')">💡 Answer</button>
+        <button class="panel-tab" id="tabCoachBtn" onclick="switchTab('coach')">🎯 Coaching <span class="tab-badge" id="fillerBadge" style="display:none">0</span></button>
+        <button class="panel-tab" id="tabStoryBtn" onclick="switchTab('story')">📖 Story Bank</button>
+        <button class="panel-tab" id="tabCodeBtn" onclick="switchTab('code')">💻 Code <span id="codeBadge" style="display:none" class="code-tab-badge">!</span></button>
+      </div>
+
+      <!-- Answer Tab -->
+      <div class="tab-content active" id="tabAnswer">
+        <div class="empty-state" id="emptyState">
+          <div class="empty-icon">🎧</div>
+          <div class="empty-title">Ready to assist</div>
+          <div class="empty-sub">Start the mic or type a question — I'll give you real-time guidance instantly</div>
+          <div class="empty-shortcuts">
+            <div class="shortcut-row"><span class="kbd">Ctrl+M</span> Toggle mic</div>
+            <div class="shortcut-row"><span class="kbd">Ctrl+Enter</span> Analyze typed question</div>
+            <div class="shortcut-row"><span class="kbd">Ctrl+K</span> Clear session</div>
+            <div class="shortcut-row"><span class="kbd">Ctrl+S</span> Stealth mode</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Coaching Tab -->
+      <div class="tab-content" id="tabCoach">
+
+        <!-- Stats row -->
+        <div class="stats-row">
+          <div class="stat-box">
+            <div class="stat-val" id="coachWordCount">0</div>
+            <div class="stat-lbl">Words Spoken</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val" id="coachFillerTotal">0</div>
+            <div class="stat-lbl">Filler Words</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val" id="coachWpm">—</div>
+            <div class="stat-lbl">Words / Min</div>
+          </div>
+        </div>
+
+        <!-- Silence nudge -->
+        <div class="coaching-card">
+          <div class="coaching-card-title">🔇 Silence Detector</div>
+          <div class="silence-bar" id="silenceBar">
+            <span id="silenceLabel">Speaking normally</span>
+            <div class="silence-meter">
+              <div class="silence-fill" id="silenceFill" style="width:0%"></div>
+            </div>
+            <span id="silenceTimer" style="font-size:0.72rem;color:var(--text3);min-width:28px;text-align:right">0s</span>
+          </div>
+        </div>
+
+        <!-- Pace meter -->
+        <div class="coaching-card">
+          <div class="coaching-card-title">⚡ Speaking Pace</div>
+          <div class="pace-bar-wrap">
+            <div class="pace-bar-fill" id="paceBarFill" style="width:0%"></div>
+          </div>
+          <div class="pace-labels"><span>Slow</span><span>Ideal (130 wpm)</span><span>Fast</span></div>
+          <div class="pace-status good" id="paceStatus">Start speaking to measure pace</div>
+        </div>
+
+        <!-- Filler word tracker -->
+        <div class="coaching-card">
+          <div class="coaching-card-title">🚫 Filler Words <span id="fillerResetBtn" onclick="resetFillers()" style="cursor:pointer;font-size:0.7rem;color:var(--accent);text-transform:none;letter-spacing:0">Reset</span></div>
+          <div class="filler-grid">
+            <div class="filler-item" id="filler-um">
+              <div class="filler-word">um</div>
+              <div class="filler-count" id="count-um">0</div>
+            </div>
+            <div class="filler-item" id="filler-uh">
+              <div class="filler-word">uh</div>
+              <div class="filler-count" id="count-uh">0</div>
+            </div>
+            <div class="filler-item" id="filler-like">
+              <div class="filler-word">like</div>
+              <div class="filler-count" id="count-like">0</div>
+            </div>
+            <div class="filler-item" id="filler-know">
+              <div class="filler-word">you know</div>
+              <div class="filler-count" id="count-know">0</div>
+            </div>
+            <div class="filler-item" id="filler-so">
+              <div class="filler-word">so</div>
+              <div class="filler-count" id="count-so">0</div>
+            </div>
+            <div class="filler-item" id="filler-basically">
+              <div class="filler-word">basically</div>
+              <div class="filler-count" id="count-basically">0</div>
+            </div>
+            <div class="filler-item" id="filler-right">
+              <div class="filler-word">right?</div>
+              <div class="filler-count" id="count-right">0</div>
+            </div>
+            <div class="filler-item" id="filler-actually">
+              <div class="filler-word">actually</div>
+              <div class="filler-count" id="count-actually">0</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Story Bank Tab -->
+      <div class="tab-content" id="tabStory">
+
+        <!-- Add story form -->
+        <div class="coaching-card">
+          <div class="coaching-card-title">➕ Add a Story</div>
+          <div class="add-story-form">
+            <input type="text" class="add-story-title-input" id="storyTitleInput" placeholder="Story title (e.g. Led data migration at Walmart)"/>
+            <select id="storyTagSelect">
+              <option value="achievement">🏆 Achievement</option>
+              <option value="leadership">👑 Leadership</option>
+              <option value="failure">💡 Failure / Learning</option>
+              <option value="conflict">🤝 Conflict / Disagreement</option>
+              <option value="teamwork">👥 Teamwork</option>
+              <option value="general">📌 General</option>
+            </select>
+            <textarea id="storyTextInput" placeholder="Write your STAR story here — Situation, what you did, and the result with numbers if possible..."></textarea>
+            <button class="btn-xs btn-primary" style="width:100%;margin-top:6px" onclick="addStory()">Save Story</button>
+          </div>
+        </div>
+
+        <!-- Story list -->
+        <div id="storyList">
+          <div class="story-empty">No stories saved yet. Add your best STAR stories above so you can pull them up instantly during the interview.</div>
+        </div>
+
+      </div>
+
+      <!-- Code Tab -->
+      <div class="tab-content" id="tabCode">
+        <div class="code-panel">
+
+          <!-- Language selector -->
+          <div class="code-lang-group" id="codeLangGroup">
+            <button class="lang-btn active" data-lang="sql" onclick="setCodeLang('sql')">SQL</button>
+            <button class="lang-btn" data-lang="python" onclick="setCodeLang('python')">Python</button>
+            <button class="lang-btn" data-lang="excel" onclick="setCodeLang('excel')">Excel / DAX</button>
+            <button class="lang-btn" data-lang="general" onclick="setCodeLang('general')">General</button>
+          </div>
+
+          <!-- Question input -->
+          <textarea id="codeQuestionInput" class="code-question-input"
+            placeholder="Type or paste the coding question here… (or it auto-fills from your mic)"
+            onkeydown="if(event.ctrlKey&&event.key==='Enter'){submitCodeQuestion();event.preventDefault()}"
+          ></textarea>
+
+          <!-- Submit -->
+          <button class="code-submit-btn" id="codeSubmitBtn" onclick="submitCodeQuestion()">⚡ Get Answer  <span style="font-size:0.7rem;opacity:0.7">(Ctrl+Enter)</span></button>
+
+          <!-- Output -->
+          <div id="codeOutputArea" class="code-output-area">
+            <div class="empty-state" style="padding:28px 0">
+              <div class="empty-icon">💻</div>
+              <div class="empty-title">Coding Assistant Ready</div>
+              <div class="empty-sub">Pick a language, paste the question, hit Get Answer</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<!-- ── ANALYTICS SCREEN ── -->
+<div id="analyticsScreen" class="screen">
+
+  <div class="analytics-topbar">
+    <div class="analytics-topbar-left">
+      <span class="analytics-badge">📊 SESSION REPORT</span>
+      <div>
+        <div class="analytics-title" id="analyticsTitle">Session Report</div>
+        <div class="analytics-meta" id="analyticsMeta">—</div>
+      </div>
+    </div>
+    <div class="analytics-topbar-right">
+      <button class="btn-analytics ghost" onclick="analyticsBack()">← Continue Session</button>
+      <button class="btn-analytics ghost" onclick="downloadTxt()">⬇️ Save .txt</button>
+      <button class="btn-analytics ghost" onclick="downloadPdf()">🖨 Save PDF</button>
+      <button class="btn-analytics danger" id="analyticsExitBtn" onclick="analyticsExit()">Clear &amp; Exit</button>
+    </div>
+  </div>
+
+  <div class="analytics-body" id="analyticsBody">
+    <!-- filled by buildAnalyticsReport() -->
+  </div>
+
+</div>
+
+<!-- ── MOCK INTERVIEW SCREEN ── -->
+<div id="mockScreen" class="screen">
+
+  <!-- Mock Topbar -->
+  <div class="mock-topbar">
+    <div class="mock-topbar-left">
+      <span class="mock-badge">🎭 MOCK MODE</span>
+      <div>
+        <div class="mock-title" id="mockTitle">Mock Interview</div>
+        <div class="mock-meta" id="mockMeta">Loading...</div>
+      </div>
+    </div>
+    <div class="mock-topbar-right">
+      <span class="mock-q-counter" id="mockQCounter">Question 0</span>
+      <button class="mock-end-btn" onclick="exitMockMode()">✕ End Mock</button>
+    </div>
+  </div>
+
+  <!-- Chat + Mic Body -->
+  <div class="mock-body">
+
+    <!-- Start screen (shown before first question loads) -->
+    <div id="mockStartScreen" class="mock-start-screen">
+      <div class="mock-start-icon">🎙</div>
+      <div class="mock-start-title">Ready to start your mock interview?</div>
+      <div class="mock-start-sub" id="mockStartSub">Claude will play the interviewer and ask you questions one at a time. Answer using your mic — after each answer, it'll ask a follow-up to go deeper.</div>
+      <button class="mock-start-btn" onclick="beginMockSession()">Start Interview</button>
+    </div>
+
+    <!-- Chat thread (hidden until first question) -->
+    <div id="mockChat" class="mock-chat" style="display:none"></div>
+
+    <!-- Input bar (hidden until first question) -->
+    <div id="mockInputBar" class="mock-input-bar" style="display:none">
+      <button class="mock-mic-btn idle" id="mockMicBtn" onclick="toggleMockMic()">🎙</button>
+      <div style="flex:1">
+        <div class="mock-live-text" id="mockLiveText">Waiting for Claude's question…</div>
+        <div class="mock-status-line" id="mockStatusLine">Press mic or wait for the question to appear</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── Confirm leave modal ── -->
+<div class="modal-overlay" id="leaveModal">
+  <div class="modal">
+    <div class="modal-title">Return to Setup?</div>
+    <div class="modal-sub">Your current session transcript and history will be cleared. Make sure to export anything you want to keep first.</div>
+    <div class="modal-actions">
+      <button class="btn-modal-primary" onclick="confirmLeave()">Yes, go to Setup</button>
+      <button class="btn-modal-ghost" onclick="closeModal('leaveModal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Toast container ── -->
+<div class="toast-container" id="toastContainer"></div>
+
+
+<script>
+// ═══════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════
+const STATE = {
+  // Setup
+  apiKey: '',
+  candidateName: '',
+  targetRole: '',
+  targetCompany: '',
+  resume: '',
+  jobDescription: '',
+  interviewType: 'mixed',
+  tone: 'confident',
+  interviewRound: 'round1',
+  interviewerInfo: '',
+  interviewContext: '',
+
+  // Session
+  isListening: false,
+  finalTranscript: '',
+  lastAnalyzed: '',
+  questionHistory: [],
+  currentType: null,
+
+  // Timer
+  timerRunning: false,
+  timerSeconds: 0,
+  timerInterval: null,
+
+  // Stealth
+  stealthMode: false,
+
+  // Recognition
+  recognition: null,
+  restartTimeout: null,
+
+  // Coaching (Session 3)
+  fillers: { um:0, uh:0, like:0, know:0, so:0, basically:0, right:0, actually:0 },
+  wordCount: 0,
+  speakingStartTime: null,
+  lastSpeechTime: null,
+  silenceInterval: null,
+  silenceSeconds: 0,
+  wpmHistory: [],
+  activeTab: 'answer',
+
+  // Story bank
+  stories: [],
+
+  // Analytics (Session 6)
+  _analyticsReturnAction: null, // 'setup' | 'clear'
+  _latestHistoryItem: null,
+
+  // Coding (Session 4)
+  codeLang: 'sql',
+  codeHistory: [],
+
+  // Mock Interview (Session 5)
+  mockMode: false,
+  mockMessages: [],       // full conversation history for Claude
+  mockQuestionCount: 0,
+  mockIsListening: false,
+  mockFinalTranscript: '',
+  mockLastProcessed: '',
+  mockWaitingForAnswer: false,
+  mockTimeout: null,
+};
+
+// ═══════════════════════════════════════════
+//  KNOWLEDGE BASE (Fallback — no API needed)
+// ═══════════════════════════════════════════
+const KB = {
+  behavioral: {
+    patterns: [
+      /tell me about (yourself|your experience|your background|your journey)/i,
+      /walk me through|introduce yourself/i,
+      /why (do you want|are you interested|should we hire)/i,
+      /strength|weakness|area.*(improve|development)/i,
+      /tell me about a time|give me an example|describe a (situation|time|challenge)/i,
+      /how do you handle (conflict|pressure|stress|failure|disagreement)/i,
+      /greatest (achievement|accomplishment|failure|mistake)/i,
+      /team(work|mate)|collaborate|work with others/i,
+      /leadership|led a team|manage people/i,
+      /where do you see yourself/i,
+      /what motivates|why this (company|role)/i,
+    ],
+    subtypes: {
+      intro: {
+        trigger: /tell me about (yourself|your experience|your background|your journey)|walk me through|introduce yourself/i,
+        framework: 'Present → Past → Future',
+        competency: 'Communication & Self-Awareness',
+        trap: false,
+        steps: [
+          {t:'Present Role', d:'Start with your current role and what you own day-to-day (2–3 sentences max)'},
+          {t:'Past & Highlights', d:'Connect 1–2 key past experiences that built you for this role. Be specific.'},
+          {t:'Skills Match', d:'Name 2–3 skills directly relevant to THIS role and company'},
+          {t:'Why Here', d:'End with genuine excitement about this specific company and role'},
+        ],
+        tips:[
+          'Keep to ~90 seconds — this is your elevator pitch, not your life story',
+          'End by connecting directly to why you\'re excited about THIS specific opportunity',
+          'Practice until natural — it should never sound memorized',
+        ]
+      },
+      strength: {
+        trigger: /strength|what are you good at|best quality/i,
+        framework: 'Name → Example → Impact → Relevance',
+        competency: 'Self-Awareness',
+        trap: false,
+        steps: [
+          {t:'Name It Specifically', d:'Avoid generic words. Use: "systems thinking", "cross-functional communication", "turning ambiguity into clarity"'},
+          {t:'Concrete Example', d:'One real, specific situation where this strength created value (30 seconds)'},
+          {t:'Quantified Impact', d:'Add a number: "40% faster", "shipped 3 days early", "reduced errors by half"'},
+          {t:'Tie to This Role', d:'Explain exactly how this strength will help THIS team at THIS company'},
+        ],
+        tips:[
+          'Have 3 different strengths prepped — pick the most relevant to this role',
+          'Strengths that combine technical AND soft skills are the most powerful',
+          'Avoid: hardworking, passionate, perfectionist — these are red flags for interviewers',
+        ]
+      },
+      weakness: {
+        trigger: /weakness|area.*improve|what.*work on|constructive criticism/i,
+        framework: 'Acknowledge → Action → Progress',
+        competency: 'Self-Awareness & Growth Mindset',
+        trap: true,
+        trapMsg: '⚠️ Trap question — they\'re testing self-awareness and honesty. Never say "I work too hard".',
+        steps: [
+          {t:'Name a Real Weakness', d:'Choose something real but NOT critical to this role. E.g., "I over-prepare before delegating"'},
+          {t:'What You Did About It', d:'Specific steps: course, mentor, process change, deliberate practice'},
+          {t:'Show Progress', d:'"I now delegate X tasks per sprint with clear success metrics" — show it\'s improving'},
+          {t:'Frame as Journey', d:'Not "I fixed it" but "I\'m actively managing it" — shows ongoing self-awareness'},
+        ],
+        tips:[
+          'Never name a weakness that is core to the job description',
+          'The formula: Real weakness + active improvement + measurable progress',
+          'Best answers show you sought feedback proactively, not just reacted to it',
+        ]
+      },
+      default: {
+        framework: 'STAR Method',
+        competency: 'Situational Judgement',
+        trap: false,
+        steps: [
+          {t:'S — Situation', d:'Set the scene in 1–2 sentences. Give just enough context to understand the stakes'},
+          {t:'T — Task', d:'What was YOUR specific responsibility? Make clear what you personally owned'},
+          {t:'A — Action', d:'Walk through the specific steps YOU took. Use "I" not "we". This gets 60% of your answer time'},
+          {t:'R — Result', d:'What happened? Quantify if possible. What did you learn?'},
+        ],
+        tips:[
+          'Spend 60–70% of your answer on the Action step — that\'s what they\'re evaluating',
+          'Always end on a positive result OR a clear lesson learned',
+          'Have 5–6 versatile STAR stories ready that can cover different question types',
+        ]
+      }
+    }
+  },
+
+  technical: {
+    patterns: [
+      /design (a|an|the) system|system design/i,
+      /how would you (design|build|implement|scale|architect)/i,
+      /debug|troubleshoot|fix a bug/i,
+      /algorithm|data structure|big.?o|complexity/i,
+      /trade.?off|pros and cons|advantages/i,
+      /database|sql|nosql|cache|redis|kafka|queue/i,
+      /microservice|monolith|architecture|api design/i,
+      /code review|best practice|clean code|testing/i,
+      /performance|scalability|reliability|availability/i,
+      /explain (how|what|why)/i,
+    ],
+    subtypes: {
+      systemDesign: {
+        trigger: /design (a|an|the) system|system design|how would you (build|architect|design)/i,
+        framework: 'RESHADED Framework',
+        competency: 'System Design & Architecture',
+        trap: false,
+        steps: [
+          {t:'R — Requirements', d:'Clarify functional & non-functional needs. Ask: scale (DAU?), latency requirements, consistency needs'},
+          {t:'E — Estimation', d:'Back-of-envelope: storage, bandwidth, QPS. Show quantitative thinking'},
+          {t:'S — Storage Schema', d:'Data models, SQL vs NoSQL choice, key entities and relationships'},
+          {t:'H — High-Level Design', d:'Draw the architecture: clients → LB → services → DB → cache → CDN'},
+          {t:'A — API Design', d:'Define core endpoints, request/response shapes, authentication'},
+          {t:'D — Detailed Deep-Dive', d:'Pick 2–3 critical components to go deep on. Explain data flow and bottlenecks'},
+          {t:'E — Edge Cases', d:'Failures, hotspots, data consistency, security, monitoring'},
+        ],
+        tips:[
+          'ALWAYS clarify requirements first — never assume scale or features',
+          'Think out loud throughout — the reasoning process matters as much as the answer',
+          'Start simple then optimize: propose basic solution first, then iterate',
+        ]
+      },
+      debug: {
+        trigger: /debug|troubleshoot|bug|error|not working/i,
+        framework: 'Systematic Debugging',
+        competency: 'Problem Solving',
+        trap: false,
+        steps: [
+          {t:'Reproduce', d:'First confirm you can reliably reproduce the issue with a minimal test case'},
+          {t:'Isolate', d:'Binary search the problem: which layer? frontend, backend, DB, network, config?'},
+          {t:'Hypothesize', d:'Form 2–3 ranked hypotheses based on the evidence. Most likely first.'},
+          {t:'Test & Validate', d:'Add logging, use debugger, write failing unit test. Prove/disprove each hypothesis'},
+          {t:'Fix & Prevent', d:'Implement the fix, add regression test, add monitoring to catch it earlier next time'},
+        ],
+        tips:[
+          'Describe the tools you\'d use: debugger, APM, logs, profiler, network inspector',
+          'Show methodical thinking — random guessing is a red flag',
+          'Always end with how to prevent this class of bug in the future',
+        ]
+      },
+      default: {
+        framework: 'Clarify → Solve → Analyze → Optimize',
+        competency: 'Technical Problem Solving',
+        trap: false,
+        steps: [
+          {t:'Clarify & Scope', d:'Ask clarifying questions. Confirm constraints, scale, and what success looks like'},
+          {t:'Think Aloud', d:'Narrate every step of your reasoning — this is what\'s being evaluated'},
+          {t:'Start Simple', d:'Propose a working basic solution first, even if suboptimal. Then iterate.'},
+          {t:'Analyze Trade-offs', d:'Compare your approach to alternatives. Discuss time/space complexity'},
+          {t:'Optimize & Harden', d:'Improve the solution, add edge cases, error handling, testing strategy'},
+        ],
+        tips:[
+          'It\'s perfectly fine to not know something — show how you\'d figure it out',
+          'Use concrete examples to validate your approach as you explain it',
+          'Always mention testing, monitoring, and error handling as part of your solution',
+        ]
+      }
+    }
+  },
+
+  pm: {
+    patterns: [
+      /product sense|product thinking|improve|redesign/i,
+      /what metrics|how do you measure|kpi|north star/i,
+      /product (roadmap|strategy|vision|launch)/i,
+      /prioritize|prioritization|backlog|trade.?off between/i,
+      /user (research|feedback|persona)|customer/i,
+      /go.?to.?market|gtm|launch (strategy|plan)/i,
+      /a\/b test|experiment|hypothesis/i,
+      /root cause|drop in (metric|dau|revenue|engagement)/i,
+      /why pm|why product/i,
+    ],
+    subtypes: {
+      metricDrop: {
+        trigger: /drop|decrease|decline|fall|went down|metric/i,
+        framework: 'Metric Drop Analysis',
+        competency: 'Analytical Thinking',
+        trap: false,
+        steps: [
+          {t:'Clarify the Metric', d:'Confirm exact definition, timeframe, magnitude. Is it a single metric or compound?'},
+          {t:'Rule Out External', d:'Holidays, competitor launches, PR events, data pipeline issues, A/B tests recently started'},
+          {t:'Segment the Data', d:'Break down by: platform (iOS/Android/web), geography, user type, feature, funnel step'},
+          {t:'Form Hypotheses', d:'List 3–5 root causes ranked by likelihood. Let data segments guide your prioritization'},
+          {t:'Validate & Act', d:'What queries/dashboards/user research would confirm? Short-term fix + long-term prevention'},
+        ],
+        tips:[
+          'Always start by confirming the metric definition — different teams measure differently',
+          'Work through dimensions exhaustively before jumping to a conclusion',
+          'Show you know your data tools: SQL, Amplitude, Mixpanel, Looker etc.',
+        ]
+      },
+      prioritize: {
+        trigger: /prioritize|prioritization|roadmap|backlog|which feature/i,
+        framework: 'RICE Framework',
+        competency: 'Strategic Thinking & Prioritization',
+        trap: false,
+        steps: [
+          {t:'Align to Goal', d:'What is the current OKR / north star? All prioritization should flow from this'},
+          {t:'List & Define', d:'Clearly enumerate all candidate features or initiatives being considered'},
+          {t:'Score with RICE', d:'Reach × Impact × Confidence ÷ Effort. Compare scores objectively and transparently'},
+          {t:'Check Dependencies', d:'Are some features blockers for others? Factor in technical debt and resourcing'},
+          {t:'Communicate', d:'Explain what you prioritized AND what you deprioritized — and why each decision was made'},
+        ],
+        tips:[
+          'Always tie priorities to user outcomes and business metrics — never just "we want this feature"',
+          'Showing you can say NO is as important as saying yes',
+          'Mention stakeholder alignment: how you\'d get engineering, design, and business on board',
+        ]
+      },
+      default: {
+        framework: 'Goal → User → Solution → Metrics',
+        competency: 'Product Thinking',
+        trap: false,
+        steps: [
+          {t:'Understand the Goal', d:'What\'s the user problem AND the business objective? Align before solving anything'},
+          {t:'Define the User', d:'Primary user persona, their pain points, behaviors, and what success looks like for them'},
+          {t:'Brainstorm Solutions', d:'Generate 3–5 distinct solutions. Think creatively — don\'t just name the obvious one'},
+          {t:'Prioritize & Pick', d:'Use impact vs effort to choose. Explain your reasoning clearly and honestly'},
+          {t:'Define Success Metrics', d:'Primary metric + guardrail metrics. What does good look like in 30/90 days?'},
+        ],
+        tips:[
+          'Always start with the user and the goal — never jump straight to solutions',
+          'Show strategic thinking: how does this connect to the broader product vision?',
+          'Mention both quantitative (metrics) and qualitative (user research) signals',
+        ]
+      }
+    }
+  }
+};
+
+// ═══════════════════════════════════════════
+//  SETUP SCREEN LOGIC
+// ═══════════════════════════════════════════
+function selectType(el, val) {
+  document.querySelectorAll('.type-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  STATE.interviewType = val;
+}
+
+function selectTone(el, val) {
+  document.querySelectorAll('.tone-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  STATE.tone = val;
+}
+
+function toggleApiKey() {
+  const input = document.getElementById('apiKey');
+  const btn = document.querySelector('.api-key-toggle');
+  if (input.type === 'password') {
+    input.type = 'text';
+    btn.textContent = 'Hide';
+  } else {
+    input.type = 'password';
+    btn.textContent = 'Show';
+  }
+}
+
+function showApiKeyCard() {
+  document.getElementById('apiKeyCard').style.display = 'block';
+  document.getElementById('apiKeySavedRow').style.display = 'none';
+}
+
+// Track progress
+const requiredFields = ['candidateName','targetCompany','targetRole','resume','jobDescription'];
+requiredFields.forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('input', updateProgress);
+});
+
+function updateProgress() {
+  const filled = requiredFields.filter(id => {
+    const el = document.getElementById(id);
+    return el && el.value.trim().length > 0;
+  });
+  const pct = Math.round((filled.length / requiredFields.length) * 100);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressPct').textContent = pct + '%';
+
+  const startBtn = document.getElementById('startBtn');
+  if (pct === 100) {
+    startBtn.disabled = false;
+    document.getElementById('progressLabel').textContent = '✅ All set — ready to start!';
+  } else {
+    startBtn.disabled = true;
+    document.getElementById('progressLabel').textContent = `${requiredFields.length - filled.length} required field${requiredFields.length - filled.length !== 1 ? 's' : ''} remaining`;
+  }
+}
+
+function loadSavedSetup() {
+  const saved = localStorage.getItem('vignix_setup');
+  if (!saved) return;
+  try {
+    const data = JSON.parse(saved);
+    if (data.candidateName) document.getElementById('candidateName').value = data.candidateName;
+    if (data.targetCompany) document.getElementById('targetCompany').value = data.targetCompany;
+    if (data.targetRole) document.getElementById('targetRole').value = data.targetRole;
+    if (data.resume) document.getElementById('resume').value = data.resume;
+    if (data.jobDescription) document.getElementById('jobDescription').value = data.jobDescription;
+    if (data.apiKey) {
+      document.getElementById('apiKey').value = data.apiKey;
+      // Hide API card, show saved indicator
+      document.getElementById('apiKeyCard').style.display = 'none';
+      document.getElementById('apiKeySavedRow').style.display = 'block';
+    }
+    if (data.interviewType) {
+      STATE.interviewType = data.interviewType;
+      document.querySelectorAll('.type-option').forEach(o => {
+        const val = o.querySelector('input').value;
+        o.classList.toggle('selected', val === data.interviewType);
+      });
+    }
+    if (data.tone) {
+      STATE.tone = data.tone;
+      document.querySelectorAll('.tone-option').forEach(o => {
+        const val = o.querySelector('input').value;
+        o.classList.toggle('selected', val === data.tone);
+      });
+    }
+    if (data.interviewRound) document.getElementById('interviewRound').value = data.interviewRound;
+    if (data.interviewerInfo) document.getElementById('interviewerInfo').value = data.interviewerInfo;
+    if (data.interviewContext) document.getElementById('interviewContext').value = data.interviewContext;
+    updateProgress();
+    if (requiredFields.every(id => document.getElementById(id).value.trim())) {
+      showToast('Welcome back! Your previous setup was loaded.', 'info');
+    }
+  } catch(e) {}
+}
+
+function saveSetup() {
+  const data = {
+    candidateName: document.getElementById('candidateName').value.trim(),
+    targetCompany: document.getElementById('targetCompany').value.trim(),
+    targetRole: document.getElementById('targetRole').value.trim(),
+    resume: document.getElementById('resume').value.trim(),
+    jobDescription: document.getElementById('jobDescription').value.trim(),
+    apiKey: document.getElementById('apiKey').value.trim(),
+    interviewType: STATE.interviewType,
+    tone: STATE.tone,
+    interviewRound: document.getElementById('interviewRound').value,
+    interviewerInfo: document.getElementById('interviewerInfo').value.trim(),
+    interviewContext: document.getElementById('interviewContext').value.trim(),
+  };
+  localStorage.setItem('vignix_setup', JSON.stringify(data));
+  return data;
+}
+
+function startInterview() {
+  // Validate
+  let valid = true;
+  requiredFields.forEach(id => {
+    const el = document.getElementById(id);
+    const errEl = document.getElementById(id + 'Error') ||
+                  document.getElementById(id.replace('candidateName','name').replace('targetCompany','company').replace('targetRole','role').replace('jobDescription','jd') + 'Error');
+    if (!el.value.trim()) {
+      el.classList.add('error');
+      if (errEl) errEl.style.display = 'block';
+      valid = false;
+    } else {
+      el.classList.remove('error');
+      if (errEl) errEl.style.display = 'none';
+    }
+  });
+  if (!valid) {
+    showToast('Please fill in all required fields', 'error');
+    return;
+  }
+
+  const data = saveSetup();
+  STATE.apiKey = data.apiKey;
+  STATE.candidateName = data.candidateName;
+  STATE.targetRole = data.targetRole;
+  STATE.targetCompany = data.targetCompany;
+  STATE.resume = data.resume;
+  STATE.jobDescription = data.jobDescription;
+  STATE.interviewRound = data.interviewRound || 'round1';
+  STATE.interviewerInfo = data.interviewerInfo || '';
+  STATE.interviewContext = data.interviewContext || '';
+
+  // Populate topbar
+  document.getElementById('tb-name').textContent = data.candidateName;
+  document.getElementById('tb-meta').textContent = `${data.targetRole} @ ${data.targetCompany}`;
+  document.getElementById('si-name').textContent = data.candidateName;
+  document.getElementById('si-role').textContent = data.targetRole;
+  document.getElementById('si-company').textContent = data.targetCompany;
+  const typeMap = {mixed:'Mixed',engineering:'Software Eng.',behavioral:'Behavioral',pm:'Product'};
+  document.getElementById('si-type').textContent = typeMap[STATE.interviewType] || 'Mixed';
+
+  // Switch screens
+  document.getElementById('setupScreen').classList.remove('active');
+  document.getElementById('interviewScreen').classList.add('active');
+
+  if (!data.apiKey) {
+    showToast('No API key — using offline knowledge base', 'info');
+  } else {
+    showToast(`Session started! Good luck, ${data.candidateName} 🎯`, 'success');
+  }
+}
+
+// ═══════════════════════════════════════════
+//  SPEECH RECOGNITION
+// ═══════════════════════════════════════════
+function initRecognition() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) {
+    showToast('Speech recognition not supported. Use Chrome or Edge.', 'error');
+    return false;
+  }
+  STATE.recognition = new SR();
+  STATE.recognition.continuous = true;
+  STATE.recognition.interimResults = true;
+  STATE.recognition.lang = 'en-US';
+  STATE.recognition.maxAlternatives = 1;
+
+  STATE.recognition.onresult = (e) => {
+    let hasFinal = false;
+    let interim = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      const t = e.results[i][0].transcript;
+      if (e.results[i].isFinal) {
+        if (STATE.mockMode) {
+          STATE.mockFinalTranscript += t + ' ';
+        } else {
+          STATE.finalTranscript += t + ' ';
+        }
+        hasFinal = true;
+      } else {
+        interim += t;
+      }
+    }
+
+    if (STATE.mockMode) {
+      // ── MOCK MODE routing ──
+      const liveEl = document.getElementById('mockLiveText');
+      if (liveEl) liveEl.textContent = (STATE.mockFinalTranscript + interim).trim() || 'Listening…';
+      if (hasFinal && STATE.mockWaitingForAnswer) {
+        scheduleMockAnalysis(STATE.mockFinalTranscript.trim());
+      }
+    } else {
+      // ── NORMAL MODE routing ──
+      renderTranscript(STATE.finalTranscript, interim);
+      if (hasFinal) {
+        const newText = STATE.finalTranscript.trim();
+        trackFillers(newText);
+        trackPace(newText);
+        STATE.lastSpeechTime = Date.now();
+      }
+      if (hasFinal && STATE.finalTranscript.trim().length > 15) {
+        scheduleAnalysis(STATE.finalTranscript.trim());
+      }
+    }
+  };
+
+  STATE.recognition.onaudiostart = () => {
+    document.getElementById('transcriptBox').innerHTML =
+      '<span class="transcript-placeholder">🎙 Listening — start speaking...</span>';
+  };
+
+  STATE.recognition.onspeechstart = () => {
+    document.getElementById('transcriptBox').innerHTML =
+      '<span class="transcript-placeholder">✍️ Processing speech...</span>';
+  };
+
+  STATE.recognition.onerror = (e) => {
+    console.error('Speech recognition error:', e.error);
+    if (e.error === 'not-allowed') {
+      showToast('Microphone access denied. Allow mic in browser settings.', 'error');
+      stopListening();
+    } else if (e.error === 'network') {
+      showToast('Network error — speech recognition needs internet connection.', 'error');
+    } else if (e.error === 'no-speech') {
+      // No speech detected — silently continue
+    } else if (e.error === 'audio-capture') {
+      showToast('No microphone found. Please check your mic is connected.', 'error');
+      stopListening();
+    } else if (e.error === 'aborted') {
+      // Ignore — happens during manual stop
+    } else {
+      showToast(`Mic error: ${e.error} — retrying...`, 'info');
+    }
+  };
+
+  STATE.recognition.onend = () => {
+    if (STATE.mockMode && STATE.mockIsListening) {
+      // Auto-restart mic in mock mode while waiting for answer
+      clearTimeout(STATE.restartTimeout);
+      STATE.restartTimeout = setTimeout(() => {
+        try { STATE.recognition.start(); } catch(err) {}
+      }, 300);
+    } else if (!STATE.mockMode && STATE.isListening) {
+      clearTimeout(STATE.restartTimeout);
+      STATE.restartTimeout = setTimeout(() => {
+        try {
+          STATE.recognition.start();
+        } catch(err) {
+          console.warn('Recognition restart failed:', err);
+        }
+      }, 500);
+    }
+  };
+
+  return true;
+}
+
+function toggleMic() {
+  if (!STATE.isListening) startListening();
+  else stopListening();
+}
+
+function startListening() {
+  if (!STATE.recognition && !initRecognition()) return;
+  try {
+    STATE.recognition.start();
+    STATE.isListening = true;
+    STATE.finalTranscript = '';
+    STATE.speakingStartTime = Date.now();
+    STATE.lastSpeechTime = Date.now();
+    document.getElementById('micBtn').className = 'mic-btn stop';
+    document.getElementById('micBtn').innerHTML = '<span style="width:8px;height:8px;border-radius:50%;background:var(--red);display:inline-block;animation:pulse-dot 1.2s ease-in-out infinite"></span> Stop Listening';
+    document.getElementById('statusDot').className = 'status-dot listening';
+    document.getElementById('statusLabel').textContent = 'Listening';
+    startSilenceTracker();
+  } catch(e) {}
+}
+
+function stopListening() {
+  STATE.isListening = false;
+  clearTimeout(STATE.restartTimeout);
+  stopSilenceTracker();
+  if (STATE.recognition) {
+    try { STATE.recognition.stop(); } catch(e) {}
+  }
+  document.getElementById('micBtn').className = 'mic-btn start';
+  document.getElementById('micBtn').innerHTML = '🎙 Start Listening';
+  document.getElementById('statusDot').className = 'status-dot';
+  document.getElementById('statusLabel').textContent = 'Idle';
+
+  if (STATE.finalTranscript.trim()) {
+    addToHistory(STATE.finalTranscript.trim(), STATE.currentType || 'general');
+  }
+}
+
+function renderTranscript(final, interim) {
+  const box = document.getElementById('transcriptBox');
+  box.innerHTML = '';
+  if (final) {
+    const s = document.createElement('span');
+    s.textContent = final;
+    box.appendChild(s);
+  }
+  if (interim) {
+    const s = document.createElement('span');
+    s.className = 'transcript-interim';
+    s.textContent = interim;
+    box.appendChild(s);
+  }
+  if (!final && !interim) {
+    box.innerHTML = '<span class="transcript-placeholder">Transcript appears here when mic is active...</span>';
+  }
+  box.scrollTop = box.scrollHeight;
+}
+
+// ═══════════════════════════════════════════
+//  ANALYSIS ENGINE
+// ═══════════════════════════════════════════
+let analysisTimeout = null;
+
+function scheduleAnalysis(text) {
+  clearTimeout(analysisTimeout);
+  // Check for coding question in parallel — nudge user if detected
+  checkSpeechForCoding(text);
+  analysisTimeout = setTimeout(() => {
+    if (text !== STATE.lastAnalyzed && text.length > 15) {
+      STATE.lastAnalyzed = text;
+      runAnalysis(text);
+    }
+  }, 2500); // 2.5s silence after last word = question is complete
+}
+
+function runAnalysis(text) {
+  const type = detectType(text);
+  const subtype = getSubtype(text, type);
+  STATE.currentType = type;
+
+  // Fire Claude API call IMMEDIATELY (before rendering) so it runs in parallel
+  if (STATE.apiKey) {
+    STATE._apiFiredForQuestion = true;
+    callClaudeAPI(text, type);
+  }
+
+  // Always show fallback immediately (< 1 second guarantee)
+  renderAnswer(text, type, subtype);
+}
+
+function detectType(text) {
+  const t = text.toLowerCase();
+  // Check all pattern sets
+  for (const p of KB.behavioral.patterns) if (p.test(t)) return 'behavioral';
+  for (const p of KB.pm.patterns) if (p.test(t)) return 'pm';
+  for (const p of KB.technical.patterns) if (p.test(t)) return 'technical';
+  return 'general';
+}
+
+function getSubtype(text, type) {
+  if (type === 'general') return null;
+  const subtypes = KB[type]?.subtypes || {};
+  for (const [key, st] of Object.entries(subtypes)) {
+    if (st.trigger && st.trigger.test(text)) return key;
+  }
+  return 'default';
+}
+
+function getFrameworkData(type, subtype) {
+  if (type === 'general') {
+    return {
+      framework: 'Universal Answer Structure',
+      competency: 'Communication',
+      trap: false,
+      steps: [
+        {t:'Pause & Clarify', d:'Take 2 seconds. If the question is ambiguous, ask one clarifying question before diving in'},
+        {t:'State Your Approach', d:'Lead with your conclusion or framework: "I\'d approach this by..."'},
+        {t:'Give a Specific Example', d:'Anchor your answer with a concrete, real example from your experience'},
+        {t:'Summarize', d:'End with a clear 1-sentence summary of your key point'},
+      ],
+      tips:[
+        'It\'s OK to say "Let me think about that for a moment" — shows thoughtfulness',
+        'Avoid starting with "So..." or "Um..." — take a breath first',
+      ]
+    };
+  }
+  const subtypes = KB[type]?.subtypes || {};
+  return subtypes[subtype] || subtypes['default'];
+}
+
+// ═══════════════════════════════════════════
+//  RENDER ANSWER
+// ═══════════════════════════════════════════
+function renderAnswer(questionText, type, subtype) {
+  const panel = document.getElementById('tabAnswer');
+  // Auto-switch to answer tab when a new answer arrives
+  switchTab('answer');
+  const data = getFrameworkData(type, subtype);
+  if (!data) return;
+
+  const typeConfig = {
+    behavioral: {label:'🧠 Behavioral', cls:'behavioral'},
+    technical:  {label:'⚙️ Technical',  cls:'technical'},
+    pm:         {label:'📊 Product',    cls:'pm'},
+    general:    {label:'💬 General',    cls:'general'},
+  };
+  const tc = typeConfig[type] || typeConfig.general;
+
+  // Display last 250 chars of question for readability
+  const displayQ = questionText.length > 250
+    ? '...' + questionText.slice(-250)
+    : questionText;
+
+  panel.innerHTML = `
+    <div class="answer-card">
+      <div class="answer-card-header">
+        <div class="detected-q">${esc(displayQ)}</div>
+        <div class="q-type-badge qb-${tc.cls}">${tc.label}</div>
+      </div>
+      <div class="answer-card-body">
+
+        ${data.trap ? `
+        <div class="trap-warning">
+          ⚠️ ${esc(data.trapMsg || 'Trap question — tread carefully')}
+        </div>` : ''}
+
+        <div class="competency-row">
+          <span class="competency-label">Testing</span>
+          <span class="competency-val">${esc(data.competency || 'General')}</span>
+        </div>
+
+        <div class="framework-label fl-${tc.cls}">
+          📐 Framework: ${esc(data.framework)}
+        </div>
+
+        <div class="steps-list">
+          ${data.steps.map((s, i) => `
+            <div class="step-row">
+              <div class="step-num sn-${tc.cls}">${i+1}</div>
+              <div class="step-body">
+                <div class="step-title">${esc(s.t)}</div>
+                <div class="step-detail">${esc(s.d)}</div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+
+        ${data.tips && data.tips.length ? `
+        <div class="divider"></div>
+        <div class="tips-label">💡 Pro Tips</div>
+        ${data.tips.map(tip => `
+          <div class="tip-item">
+            <span class="tip-bullet">→</span>
+            ${esc(tip)}
+          </div>
+        `).join('')}
+        ` : ''}
+
+        ${STATE.apiKey ? `
+        <div class="divider"></div>
+        <div class="ai-placeholder" id="aiPlaceholder">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="display:flex;gap:4px;align-items:center">
+              <div class="ai-dot" style="animation-delay:0s"></div>
+              <div class="ai-dot" style="animation-delay:0.2s"></div>
+              <div class="ai-dot" style="animation-delay:0.4s"></div>
+            </div>
+            <span id="aiLoadingText">Claude is writing your personalized answer...</span>
+          </div>
+        </div>
+        ` : ''}
+
+      </div>
+    </div>
+  `;
+
+  // API call already fired in runAnalysis — don't double fire
+  // But if called from manual input or history replay, fire it here
+  if (STATE.apiKey && !STATE._apiFiredForQuestion) {
+    callClaudeAPI(questionText, type);
+  }
+  STATE._apiFiredForQuestion = false;
+
+  // Update type badge in topbar
+  document.getElementById('statusLabel').textContent = STATE.isListening ? 'Listening' : 'Idle';
+}
+
+// ═══════════════════════════════════════════
+//  CLAUDE API  ✅ Session 2 — LIVE
+// ═══════════════════════════════════════════
+const API_CACHE = new Map(); // question+tone → answer text
+
+async function callClaudeAPI(question, type) {
+  if (!STATE.apiKey) return;
+
+  // Cache hit — instant replay
+  const cacheKey = question.slice(0, 300) + '|' + STATE.tone;
+  if (API_CACHE.has(cacheKey)) {
+    await sleep(50);
+    const ph = document.getElementById('aiPlaceholder');
+    if (ph) renderClaudeAnswer(ph, API_CACHE.get(cacheKey));
+    return;
+  }
+
+  const systemPrompt = buildSystemPrompt();
+  const userMsg = buildUserMessage(question, type);
+
+  try {
+    const controller = new AbortController();
+    const tid = setTimeout(() => controller.abort(), 25000);
+
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'x-api-key': STATE.apiKey,
+        'anthropic-version': '2023-06-01',
+        'content-type': 'application/json',
+        'anthropic-dangerous-direct-browser-access': 'true',
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 400,
+        stream: true,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: userMsg }],
+      }),
+      signal: controller.signal,
+    });
+
+    clearTimeout(tid);
+
+    if (!res.ok) {
+      if (res.status === 401) { silentFail(document.getElementById('aiPlaceholder'), 'Invalid API key — check Setup'); return; }
+      if (res.status === 429) { silentFail(document.getElementById('aiPlaceholder'), 'Rate limited — try again in a moment'); return; }
+      throw new Error(`HTTP ${res.status}`);
+    }
+
+    // ── Streaming ──────────────────────────────
+    // Switch placeholder to streaming box immediately
+    const ph = document.getElementById('aiPlaceholder');
+    if (!ph) return;
+    ph.id = 'aiPlaceholder'; // keep id
+    ph.className = 'ai-answer-box';
+    ph.innerHTML = `
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid rgba(42,181,212,0.2)">
+        <div style="width:22px;height:22px;background:var(--brand-gradient);border-radius:5px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg width="13" height="13" viewBox="0 0 38 38" fill="none"><path d="M5 7L14.5 27L19 18L23.5 27L33 7" stroke="white" stroke-width="3.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <span style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:1.3px;color:var(--accent)">✨ Claude · Personalized Answer</span>
+        <span style="margin-left:auto;font-size:0.65rem;color:var(--text3)">${esc(STATE.targetCompany)}</span>
+      </div>
+      <div id="streamContent" style="font-size:0.875rem;color:var(--text);line-height:1.65;white-space:pre-wrap"></div>
+      <span id="streamCursor" style="display:inline-block;width:2px;height:1em;background:var(--accent);margin-left:2px;animation:pulse-dot 0.8s ease-in-out infinite;vertical-align:text-bottom"></span>
+    `;
+
+    const contentEl = document.getElementById('streamContent');
+    const cursorEl = document.getElementById('streamCursor');
+    let fullText = '';
+
+    // Read SSE stream
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop(); // keep incomplete line
+
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        const data = line.slice(6).trim();
+        if (data === '[DONE]') break;
+        try {
+          const json = JSON.parse(data);
+          const delta = json?.delta?.text || '';
+          if (delta) {
+            fullText += delta;
+            if (contentEl) contentEl.textContent = fullText;
+            // Auto-scroll right panel
+            const rp = document.getElementById('rightPanel');
+            if (rp) rp.scrollTop = rp.scrollHeight;
+          }
+        } catch(e) {}
+      }
+    }
+
+    // Stream done — clean up cursor, cache result, save to history
+    if (cursorEl) cursorEl.remove();
+    if (fullText) {
+      API_CACHE.set(cacheKey, fullText);
+      // Save answer to the latest history item
+      if (STATE._latestHistoryItem) STATE._latestHistoryItem.answer = fullText;
+      // Add footer
+      const footer = document.createElement('div');
+      footer.style.cssText = 'margin-top:8px;font-size:0.68rem;color:var(--text3);border-top:1px solid var(--border);padding-top:8px';
+      footer.textContent = `Tailored from your resume · ${STATE.tone} tone · ${STATE.targetRole}`;
+      ph.appendChild(footer);
+    }
+
+  } catch (err) {
+    const live = document.getElementById('aiPlaceholder');
+    if (live) silentFail(live, null);
+  }
+}
+
+// ── Build prompts ──────────────────────────
+function buildSystemPrompt() {
+  const toneMap = {
+    confident: 'confident and assertive — shows strong ownership and conviction',
+    humble:    'humble and collaborative — emphasizes learning, teamwork, and growth',
+    concise:   'concise and crisp — maximum 2–3 focused sentences per point, no filler',
+    detailed:  'detailed and thorough — rich with context, examples, and nuance',
+  };
+  const toneDesc = toneMap[STATE.tone] || toneMap.confident;
+
+  const roundMap = {
+    phone:  'Phone Screen — keep answers concise (~60 seconds), focus on fit and genuine interest',
+    round1: 'Round 1 — first interview, balanced depth, show enthusiasm and relevant experience',
+    round2: 'Round 2 — go deeper, lead with specifics, demonstrate real expertise and ownership',
+    round3: 'Round 3 — strategic thinking, cross-functional impact, show leadership maturity',
+    final:  'Final Round — executive presence, culture fit, big-picture thinking, long-term vision',
+    panel:  'Panel Interview — address multiple stakeholders clearly, be structured and easy to follow',
+    hiring: 'Hiring Manager Round — focus on team fit, measurable impact, and management style',
+  };
+  const roundContext = roundMap[STATE.interviewRound] || roundMap.round1;
+
+  let extraContext = `\n\nINTERVIEW ROUND: ${roundContext}`;
+  if (STATE.interviewerInfo) extraContext += `\nINTERVIEWER INFO: ${STATE.interviewerInfo}`;
+  if (STATE.interviewContext) extraContext += `\n\nADDITIONAL CONTEXT FROM CANDIDATE:\n${STATE.interviewContext}`;
+
+  return `You are helping ${STATE.candidateName} speak naturally in a ${STATE.targetRole} interview at ${STATE.targetCompany}.
+
+CANDIDATE RESUME:
+${STATE.resume}
+
+TARGET JOB DESCRIPTION:
+${STATE.jobDescription}
+
+INSTRUCTIONS:
+- Write exactly what ${STATE.candidateName} should say out loud — like a real person talking, not a formal essay.
+- Sound warm, natural, and human. The way a smart professional actually speaks in conversation.
+- Tone: ${toneDesc}.
+- Use real examples from the resume — but say them casually, like you're telling a story to someone across a table.
+- No corporate buzzwords. No "I am passionate about leveraging synergies." Talk like a real person.
+- No bullet points. Just natural flowing speech.
+- Length: 1–2 short paragraphs. Tight. 20–30 seconds to speak out loud.
+- Start straight into the answer — no "Great question", no "Certainly", no "I would say".
+- Calibrate answer depth and tone to the interview round context below.
+- End with one genuine sentence about why this specific role at ${STATE.targetCompany} excites you.${extraContext}`;
+}
+
+function buildUserMessage(question, type) {
+  const ctx = {
+    behavioral: 'Behavioral question — weave STAR naturally into the narrative (no labels).',
+    technical:  'Technical question — demonstrate hands-on depth and real-world problem solving.',
+    pm:         'Product question — show strategic thinking, user empathy, and data-driven judgment.',
+    general:    'General question — give a thoughtful, genuine, memorable answer.',
+  };
+  return `Interview question: "${question}"\n\n${ctx[type] || ctx.general}\n\nWrite the complete spoken answer for ${STATE.candidateName}.`;
+}
+
+// ── Render helpers ─────────────────────────
+function renderClaudeAnswer(el, answer) {
+  const paragraphs = answer.split(/\n\n+/).filter(p => p.trim());
+  const html = paragraphs
+    .map(p => `<p style="margin:0 0 10px;line-height:1.65;font-size:0.875rem;color:var(--text)">${esc(p.trim())}</p>`)
+    .join('');
+
+  el.id = 'aiPlaceholder'; // keep id so history replay can re-use
+  el.className = 'ai-answer-box';
+  el.innerHTML = `
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid rgba(42,181,212,0.2)">
+      <div style="width:22px;height:22px;background:var(--brand-gradient);border-radius:5px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <svg width="13" height="13" viewBox="0 0 38 38" fill="none">
+          <path d="M5 7L14.5 27L19 18L23.5 27L33 7" stroke="white" stroke-width="3.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <span style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:1.3px;color:var(--accent)">✨ Claude · Personalized Answer</span>
+      <span style="margin-left:auto;font-size:0.65rem;color:var(--text3)">${esc(STATE.targetCompany)}</span>
+    </div>
+    ${html}
+    <div style="margin-top:8px;font-size:0.68rem;color:var(--text3);border-top:1px solid var(--border);padding-top:8px">
+      Tailored from your resume · ${STATE.tone} tone · ${STATE.targetRole}
+    </div>
+  `;
+}
+
+function silentFail(el, msg) {
+  if (!el) return;
+  if (msg) {
+    el.innerHTML = `<span style="font-size:0.72rem;color:var(--text3)">⚠️ ${esc(msg)} — framework above is your guide</span>`;
+  } else {
+    el.style.display = 'none'; // just hide, KB answer is sufficient
+  }
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// ═══════════════════════════════════════════
+//  MANUAL INPUT
+// ═══════════════════════════════════════════
+function analyzeManual() {
+  const text = document.getElementById('manualInput').value.trim();
+  if (!text) return;
+  STATE.lastAnalyzed = '';
+  renderTranscript(text, '');
+  const type = detectType(text);
+  const subtype = getSubtype(text, type);
+  STATE.currentType = type;
+  renderAnswer(text, type, subtype);
+  addToHistory(text, type);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const mt = document.getElementById('manualInput');
+  if (mt) {
+    mt.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+        e.preventDefault();
+        analyzeManual();
+      }
+    });
+  }
+});
+
+// ═══════════════════════════════════════════
+//  QUESTION HISTORY
+// ═══════════════════════════════════════════
+function addToHistory(text, type) {
+  const item = {text: text.slice(0, 120), fullText: text, type: type || 'general', ts: Date.now(), answer: ''};
+  STATE.questionHistory.unshift(item);
+  if (STATE.questionHistory.length > 50) STATE.questionHistory.pop();
+  STATE._latestHistoryItem = item; // so callClaudeAPI can attach the answer
+  renderHistory();
+  autoSaveSession();
+}
+
+function renderHistory() {
+  const el = document.getElementById('historyList');
+  if (!STATE.questionHistory.length) {
+    el.innerHTML = '<div class="history-empty">No questions yet</div>';
+    return;
+  }
+  el.innerHTML = STATE.questionHistory.map((q, i) => `
+    <div class="history-item ${q.type}" onclick="replayHistory(${i})">
+      ${esc(q.text)}${q.text.length >= 120 ? '…' : ''}
+    </div>
+  `).join('');
+}
+
+function replayHistory(i) {
+  const q = STATE.questionHistory[i];
+  STATE.lastAnalyzed = '';
+  renderTranscript(q.text, '');
+  const type = detectType(q.text);
+  const subtype = getSubtype(q.text, type);
+  renderAnswer(q.text, type, subtype);
+}
+
+// ═══════════════════════════════════════════
+//  TIMER
+// ═══════════════════════════════════════════
+function startTimer() {
+  if (STATE.timerRunning) return;
+  STATE.timerRunning = true;
+  STATE.timerInterval = setInterval(() => {
+    STATE.timerSeconds++;
+    const m = Math.floor(STATE.timerSeconds / 60);
+    const s = STATE.timerSeconds % 60;
+    const el = document.getElementById('timerVal');
+    el.textContent = `${m}:${s.toString().padStart(2,'0')}`;
+    el.className = 'timer-value' +
+      (STATE.timerSeconds > 120 ? ' danger' : STATE.timerSeconds > 90 ? ' warn' : '');
+  }, 1000);
+}
+
+function resetTimer() {
+  clearInterval(STATE.timerInterval);
+  STATE.timerRunning = false;
+  STATE.timerSeconds = 0;
+  const el = document.getElementById('timerVal');
+  el.textContent = '0:00';
+  el.className = 'timer-value';
+}
+
+// ═══════════════════════════════════════════
+//  AUTO SAVE
+// ═══════════════════════════════════════════
+let saveInterval = null;
+
+function autoSaveSession() {
+  const data = {
+    questionHistory: STATE.questionHistory,
+    finalTranscript: STATE.finalTranscript,
+    savedAt: Date.now(),
+  };
+  localStorage.setItem('vignix_session', JSON.stringify(data));
+}
+
+function restoreSession() {
+  const saved = localStorage.getItem('vignix_session');
+  if (!saved) return;
+  try {
+    const data = JSON.parse(saved);
+    const age = Date.now() - (data.savedAt || 0);
+    if (age < 4 * 60 * 60 * 1000) { // restore if < 4 hours old
+      STATE.questionHistory = data.questionHistory || [];
+      STATE.finalTranscript = data.finalTranscript || '';
+      renderHistory();
+      if (STATE.finalTranscript) renderTranscript(STATE.finalTranscript, '');
+    }
+  } catch(e) {}
+}
+
+// ═══════════════════════════════════════════
+//  STEALTH MODE
+// ═══════════════════════════════════════════
+function toggleStealth() {
+  STATE.stealthMode = !STATE.stealthMode;
+  document.body.classList.toggle('stealth', STATE.stealthMode);
+  document.getElementById('stealthBtn').classList.toggle('active', STATE.stealthMode);
+  showToast(STATE.stealthMode ? 'Stealth mode ON' : 'Stealth mode OFF', 'info');
+}
+
+// ═══════════════════════════════════════════
+//  NAVIGATION
+// ═══════════════════════════════════════════
+function goToSetup() {
+  if (STATE.questionHistory.length > 0) {
+    STATE._analyticsReturnAction = 'setup';
+    enterAnalytics();
+  } else {
+    document.getElementById('leaveModal').classList.add('open');
+  }
+}
+
+const EMPTY_STATE_HTML = `
+  <div class="empty-state" id="emptyState">
+    <div class="empty-icon">🎧</div>
+    <div class="empty-title">Ready to assist</div>
+    <div class="empty-sub">Start the mic or type a question — I'll give you real-time guidance instantly</div>
+    <div class="empty-shortcuts">
+      <div class="shortcut-row"><span class="kbd">Ctrl+M</span> Toggle mic</div>
+      <div class="shortcut-row"><span class="kbd">Ctrl+Enter</span> Analyze typed question</div>
+      <div class="shortcut-row"><span class="kbd">Ctrl+K</span> Clear session</div>
+      <div class="shortcut-row"><span class="kbd">Ctrl+S</span> Stealth mode</div>
+    </div>
+  </div>`;
+
+function confirmLeave() {
+  closeModal('leaveModal');
+  if (STATE.isListening) stopListening();
+  resetTimer();
+  STATE.questionHistory = [];
+  STATE.finalTranscript = '';
+  STATE.lastAnalyzed = '';
+  renderHistory();
+  renderTranscript('', '');
+  resetFillers();
+  document.getElementById('tabAnswer').innerHTML = EMPTY_STATE_HTML;
+  document.getElementById('interviewScreen').classList.remove('active');
+  document.getElementById('setupScreen').classList.add('active');
+}
+
+function clearSession() {
+  if (STATE.questionHistory.length > 0) {
+    STATE._analyticsReturnAction = 'clear';
+    enterAnalytics();
+  } else {
+    doActualClear();
+  }
+}
+
+function doActualClear() {
+  STATE.questionHistory = [];
+  STATE.finalTranscript = '';
+  STATE.lastAnalyzed = '';
+  if (STATE.isListening) stopListening();
+  resetTimer();
+  resetFillers();
+  renderHistory();
+  renderTranscript('', '');
+  document.getElementById('manualInput').value = '';
+  document.getElementById('tabAnswer').innerHTML = EMPTY_STATE_HTML;
+  switchTab('answer');
+  showToast('Session cleared', 'info');
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+// ═══════════════════════════════════════════
+//  TOAST
+// ═══════════════════════════════════════════
+function showToast(msg, type = 'info') {
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  const icons = {success:'✅', error:'❌', info:'ℹ️'};
+  toast.innerHTML = `<span>${icons[type] || 'ℹ️'}</span> ${esc(msg)}`;
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transition = 'opacity 0.3s';
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
+}
+
+// ═══════════════════════════════════════════
+//  KEYBOARD SHORTCUTS
+// ═══════════════════════════════════════════
+document.addEventListener('keydown', e => {
+  const inInterview = document.getElementById('interviewScreen').classList.contains('active');
+  if (!inInterview) return;
+  if (e.ctrlKey || e.metaKey) {
+    switch(e.key.toLowerCase()) {
+      case 'm': e.preventDefault(); toggleMic(); break;
+      case 'k': e.preventDefault(); clearSession(); break;
+      case 's': e.preventDefault(); toggleStealth(); break;
+    }
+  }
+});
+
+// ═══════════════════════════════════════════
+//  SESSION 3 — TABS
+// ═══════════════════════════════════════════
+function switchTab(tab) {
+  STATE.activeTab = tab;
+  ['answer','coach','story','code'].forEach(t => {
+    const content = document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1));
+    const btn = document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1) + 'Btn');
+    if (content) content.classList.toggle('active', t === tab);
+    if (btn) btn.classList.toggle('active', t === tab);
+  });
+  // Clear code badge when switching to code tab
+  if (tab === 'code') {
+    const badge = document.getElementById('codeBadge');
+    if (badge) badge.style.display = 'none';
+  }
+}
+
+// ═══════════════════════════════════════════
+//  SESSION 3 — FILLER WORD TRACKER
+// ═══════════════════════════════════════════
+const FILLER_PATTERNS = {
+  um:       /\bum+\b/gi,
+  uh:       /\buh+\b/gi,
+  like:     /\blike\b/gi,
+  know:     /\byou know\b/gi,
+  so:       /\bso\b/gi,
+  basically:/\bbasically\b/gi,
+  right:    /\bright\??\b/gi,
+  actually: /\bactually\b/gi,
+};
+
+let _prevTranscriptForFillers = '';
+
+function trackFillers(fullText) {
+  const newText = fullText.slice(_prevTranscriptForFillers.length);
+  _prevTranscriptForFillers = fullText;
+  if (!newText.trim()) return;
+
+  let totalAdded = 0;
+  Object.entries(FILLER_PATTERNS).forEach(([word, pattern]) => {
+    const matches = (newText.match(pattern) || []).length;
+    if (matches > 0) {
+      STATE.fillers[word] = (STATE.fillers[word] || 0) + matches;
+      totalAdded += matches;
+      updateFillerUI(word);
+    }
+  });
+  if (totalAdded > 0) updateFillerBadge();
+  updateCoachStats(fullText);
+}
+
+function updateFillerUI(word) {
+  const count = STATE.fillers[word] || 0;
+  const countEl = document.getElementById('count-' + word);
+  const itemEl = document.getElementById('filler-' + word);
+  if (!countEl || !itemEl) return;
+  countEl.textContent = count;
+  itemEl.classList.remove('triggered', 'danger');
+  if (count >= 5) itemEl.classList.add('danger');
+  else if (count >= 2) itemEl.classList.add('triggered');
+}
+
+function updateFillerBadge() {
+  const total = Object.values(STATE.fillers).reduce((a, b) => a + b, 0);
+  const badge = document.getElementById('fillerBadge');
+  if (!badge) return;
+  if (total > 0) { badge.textContent = total; badge.style.display = 'inline'; }
+  else badge.style.display = 'none';
+  const el = document.getElementById('coachFillerTotal');
+  if (el) el.textContent = total;
+}
+
+function resetFillers() {
+  Object.keys(STATE.fillers).forEach(w => { STATE.fillers[w] = 0; });
+  _prevTranscriptForFillers = '';
+  Object.keys(FILLER_PATTERNS).forEach(w => {
+    const countEl = document.getElementById('count-' + w);
+    const itemEl = document.getElementById('filler-' + w);
+    if (countEl) countEl.textContent = '0';
+    if (itemEl) itemEl.classList.remove('triggered', 'danger');
+  });
+  updateFillerBadge();
+  const wc = document.getElementById('coachWordCount'); if (wc) wc.textContent = '0';
+  const wpm = document.getElementById('coachWpm'); if (wpm) wpm.textContent = '—';
+}
+
+function updateCoachStats(fullText) {
+  const words = fullText.trim().split(/\s+/).filter(Boolean).length;
+  STATE.wordCount = words;
+  const el = document.getElementById('coachWordCount');
+  if (el) el.textContent = words;
+}
+
+// ═══════════════════════════════════════════
+//  SESSION 3 — PACE METER
+// ═══════════════════════════════════════════
+function trackPace(fullText) {
+  if (!STATE.speakingStartTime) return;
+  const words = fullText.trim().split(/\s+/).filter(Boolean).length;
+  const minutes = (Date.now() - STATE.speakingStartTime) / 60000;
+  if (minutes < 0.1) return; // need at least 6 seconds of data
+  const wpm = Math.round(words / minutes);
+
+  const wpmEl = document.getElementById('coachWpm');
+  if (wpmEl) wpmEl.textContent = wpm;
+
+  // Ideal pace: 120–150 wpm. Update bar and status.
+  const pct = Math.min(100, (wpm / 200) * 100);
+  const bar = document.getElementById('paceBarFill');
+  const status = document.getElementById('paceStatus');
+  if (!bar || !status) return;
+
+  bar.style.width = pct + '%';
+
+  if (wpm < 90) {
+    bar.style.background = 'var(--blue)';
+    status.className = 'pace-status slow';
+    status.textContent = `${wpm} wpm — Slow down a bit, you\'re speaking too slowly`;
+  } else if (wpm <= 150) {
+    bar.style.background = 'var(--green)';
+    status.className = 'pace-status good';
+    status.textContent = `${wpm} wpm — Perfect pace ✓`;
+  } else if (wpm <= 180) {
+    bar.style.background = 'var(--yellow)';
+    status.className = 'pace-status fast';
+    status.textContent = `${wpm} wpm — Slow down slightly`;
+  } else {
+    bar.style.background = 'var(--red)';
+    status.className = 'pace-status very-fast';
+    status.textContent = `${wpm} wpm — Too fast, slow down`;
+  }
+}
+
+// ═══════════════════════════════════════════
+//  SESSION 3 — SILENCE TRACKER
+// ═══════════════════════════════════════════
+function startSilenceTracker() {
+  STATE.lastSpeechTime = Date.now();
+  clearInterval(STATE.silenceInterval);
+  STATE.silenceInterval = setInterval(() => {
+    const silenceSecs = Math.floor((Date.now() - (STATE.lastSpeechTime || Date.now())) / 1000);
+    STATE.silenceSeconds = silenceSecs;
+    const pct = Math.min(100, (silenceSecs / 8) * 100);
+    const fill = document.getElementById('silenceFill');
+    const label = document.getElementById('silenceLabel');
+    const timer = document.getElementById('silenceTimer');
+    const bar = document.getElementById('silenceBar');
+    if (!fill) return;
+
+    fill.style.width = pct + '%';
+    if (timer) timer.textContent = silenceSecs + 's';
+
+    if (silenceSecs >= 6) {
+      fill.style.background = 'var(--red)';
+      if (bar) bar.className = 'silence-bar warning';
+      if (label) label.textContent = '⚠️ Long pause — say something!';
+    } else if (silenceSecs >= 3) {
+      fill.style.background = 'var(--yellow)';
+      if (bar) bar.className = 'silence-bar warning';
+      if (label) label.textContent = 'Pause detected...';
+    } else {
+      fill.style.background = 'var(--green)';
+      if (bar) bar.className = 'silence-bar';
+      if (label) label.textContent = silenceSecs === 0 ? 'Speaking normally' : 'Brief pause';
+    }
+  }, 500);
+}
+
+function stopSilenceTracker() {
+  clearInterval(STATE.silenceInterval);
+  STATE.silenceInterval = null;
+  const fill = document.getElementById('silenceFill');
+  const label = document.getElementById('silenceLabel');
+  const timer = document.getElementById('silenceTimer');
+  const bar = document.getElementById('silenceBar');
+  if (fill) fill.style.width = '0%';
+  if (label) label.textContent = 'Mic is off';
+  if (timer) timer.textContent = '0s';
+  if (bar) bar.className = 'silence-bar';
+}
+
+// ═══════════════════════════════════════════
+//  SESSION 3 — STORY BANK
+// ═══════════════════════════════════════════
+function loadStories() {
+  const saved = localStorage.getItem('vignix_stories');
+  if (saved) try { STATE.stories = JSON.parse(saved); } catch(e) { STATE.stories = []; }
+  renderStories();
+}
+
+function saveStories() {
+  localStorage.setItem('vignix_stories', JSON.stringify(STATE.stories));
+}
+
+function addStory() {
+  const title = document.getElementById('storyTitleInput').value.trim();
+  const text = document.getElementById('storyTextInput').value.trim();
+  const tag = document.getElementById('storyTagSelect').value;
+  if (!title || !text) { showToast('Add a title and story text', 'error'); return; }
+  STATE.stories.unshift({ id: Date.now(), title, text, tag });
+  saveStories();
+  renderStories();
+  document.getElementById('storyTitleInput').value = '';
+  document.getElementById('storyTextInput').value = '';
+  showToast('Story saved!', 'success');
+}
+
+function deleteStory(id) {
+  STATE.stories = STATE.stories.filter(s => s.id !== id);
+  saveStories();
+  renderStories();
+}
+
+function useStory(id) {
+  const story = STATE.stories.find(s => s.id === id);
+  if (!story) return;
+  // Put story text in the manual input and analyze it
+  document.getElementById('manualInput').value = story.text;
+  switchTab('answer');
+  analyzeManual();
+  showToast(`Using story: "${story.title}"`, 'info');
+}
+
+function renderStories() {
+  const list = document.getElementById('storyList');
+  if (!list) return;
+  if (!STATE.stories.length) {
+    list.innerHTML = '<div class="story-empty">No stories saved yet. Add your best STAR stories above so you can pull them up instantly during the interview.</div>';
+    return;
+  }
+  const tagLabels = { achievement:'🏆 Achievement', leadership:'👑 Leadership', failure:'💡 Failure', conflict:'🤝 Conflict', teamwork:'👥 Teamwork', general:'📌 General' };
+  list.innerHTML = STATE.stories.map(s => `
+    <div class="story-item">
+      <div class="story-header">
+        <span class="story-tag st-${s.tag}">${tagLabels[s.tag] || s.tag}</span>
+        <span class="story-title">${esc(s.title)}</span>
+      </div>
+      <div class="story-preview">${esc(s.text.slice(0, 120))}${s.text.length > 120 ? '…' : ''}</div>
+      <div class="story-actions">
+        <button class="story-use-btn" onclick="useStory(${s.id})">▶ Use This Story</button>
+        <button class="story-del-btn" onclick="deleteStory(${s.id})">🗑</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ═══════════════════════════════════════════
+//  UTILITIES
+// ═══════════════════════════════════════════
+function esc(str) {
+  return String(str || '')
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;');
+}
+
+// ═══════════════════════════════════════════
+//  SESSION 6 — POST-INTERVIEW ANALYTICS
+// ═══════════════════════════════════════════
+
+function enterAnalytics() {
+  if (STATE.isListening) stopListening();
+  buildAnalyticsReport();
+  showScreen('analyticsScreen');
+}
+
+function analyticsBack() {
+  STATE._analyticsReturnAction = null;
+  showScreen('interviewScreen');
+}
+
+function analyticsExit() {
+  const action = STATE._analyticsReturnAction;
+  STATE._analyticsReturnAction = null;
+  showScreen('interviewScreen');
+  if (action === 'setup') {
+    // Actually leave to setup — do the full reset then switch
+    confirmLeave();
+  } else {
+    doActualClear();
+  }
+}
+
+// ── Build the full report ──
+function buildAnalyticsReport() {
+  const history = STATE.questionHistory;
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+  const roundLabels = {
+    phone:'Phone Screen', round1:'Round 1', round2:'Round 2',
+    round3:'Round 3', final:'Final Round', panel:'Panel Interview', hiring:'Hiring Manager Round',
+  };
+
+  // Update topbar
+  document.getElementById('analyticsTitle').textContent =
+    `${STATE.candidateName || 'Session'} · ${STATE.targetRole || ''} @ ${STATE.targetCompany || ''}`;
+  document.getElementById('analyticsMeta').textContent =
+    `${dateStr} · ${roundLabels[STATE.interviewRound] || 'Interview'}`;
+
+  // Compute stats
+  const totalQ = history.length;
+  const totalFillers = Object.values(STATE.fillers).reduce((a,b) => a+b, 0);
+  const avgWpm = STATE.wpmHistory && STATE.wpmHistory.length
+    ? Math.round(STATE.wpmHistory.reduce((a,b)=>a+b,0) / STATE.wpmHistory.length)
+    : '—';
+  const totalWords = STATE.wordCount || 0;
+
+  // Stats row
+  const statsHtml = `
+    <div class="analytics-stats-row">
+      <div class="analytics-stat">
+        <div class="analytics-stat-val">${totalQ}</div>
+        <div class="analytics-stat-lbl">Questions Answered</div>
+      </div>
+      <div class="analytics-stat">
+        <div class="analytics-stat-val">${totalWords.toLocaleString()}</div>
+        <div class="analytics-stat-lbl">Words Spoken</div>
+      </div>
+      <div class="analytics-stat">
+        <div class="analytics-stat-val">${avgWpm}</div>
+        <div class="analytics-stat-lbl">Avg WPM</div>
+      </div>
+      <div class="analytics-stat">
+        <div class="analytics-stat-val">${totalFillers}</div>
+        <div class="analytics-stat-lbl">Filler Words</div>
+      </div>
+    </div>`;
+
+  // Filler section (only if any fillers)
+  let fillerHtml = '';
+  if (totalFillers > 0) {
+    const chips = Object.entries(STATE.fillers)
+      .filter(([,v]) => v > 0)
+      .sort(([,a],[,b]) => b-a)
+      .map(([word, count]) => {
+        const cls = count >= 5 ? 'bad' : count >= 2 ? 'warn' : '';
+        return `<span class="analytics-filler-chip ${cls}">${word}: ${count}</span>`;
+      }).join('');
+    fillerHtml = `
+      <div class="analytics-section">
+        <div class="analytics-section-title">🚫 Filler Words</div>
+        <div class="analytics-filler-grid">${chips}</div>
+      </div>`;
+  }
+
+  // Q&A transcript
+  const qaItems = [...history].reverse().map((q, i) => {
+    const answerBlock = q.answer
+      ? `<div class="analytics-a-text">${esc(q.answer)}</div>`
+      : `<div class="analytics-a-none">No AI answer recorded for this question</div>`;
+    const typeLabel = {behavioral:'Behavioral',technical:'Technical',pm:'Product',general:'General'}[q.type] || 'General';
+    const time = new Date(q.ts).toLocaleTimeString('en-US', {hour:'2-digit',minute:'2-digit'});
+    return `
+      <div class="analytics-qa-item">
+        <div class="analytics-q-num">Q${i+1} · ${typeLabel} · ${time}</div>
+        <div class="analytics-q-text">${esc(q.fullText || q.text)}</div>
+        ${answerBlock}
+      </div>`;
+  }).join('');
+
+  const qaHtml = `
+    <div class="analytics-section">
+      <div class="analytics-section-title">📝 Full Q&amp;A Transcript (${totalQ} questions)</div>
+      <div class="analytics-qa-list">
+        ${totalQ === 0
+          ? '<div style="padding:20px;color:var(--text3);font-size:0.85rem;text-align:center">No questions were recorded in this session.</div>'
+          : qaItems}
+      </div>
+    </div>`;
+
+  document.getElementById('analyticsBody').innerHTML = statsHtml + fillerHtml + qaHtml;
+}
+
+// ── Export as .txt ──
+function downloadTxt() {
+  const history = [...STATE.questionHistory].reverse();
+  const roundLabels = {
+    phone:'Phone Screen', round1:'Round 1', round2:'Round 2',
+    round3:'Round 3', final:'Final Round', panel:'Panel Interview', hiring:'Hiring Manager Round',
+  };
+  const now = new Date().toLocaleString('en-US');
+  const totalFillers = Object.values(STATE.fillers).reduce((a,b)=>a+b,0);
+  const avgWpm = STATE.wpmHistory && STATE.wpmHistory.length
+    ? Math.round(STATE.wpmHistory.reduce((a,b)=>a+b,0)/STATE.wpmHistory.length) + ' wpm'
+    : 'N/A';
+
+  let txt = `VIGNIX AI ASSIST — SESSION REPORT\n`;
+  txt += `${'='.repeat(50)}\n`;
+  txt += `Candidate : ${STATE.candidateName}\n`;
+  txt += `Role      : ${STATE.targetRole}\n`;
+  txt += `Company   : ${STATE.targetCompany}\n`;
+  txt += `Round     : ${roundLabels[STATE.interviewRound] || STATE.interviewRound}\n`;
+  txt += `Date      : ${now}\n`;
+  txt += `${'='.repeat(50)}\n\n`;
+  txt += `STATS\n`;
+  txt += `Questions Answered : ${history.length}\n`;
+  txt += `Words Spoken       : ${STATE.wordCount || 0}\n`;
+  txt += `Average WPM        : ${avgWpm}\n`;
+  txt += `Total Filler Words : ${totalFillers}\n`;
+  if (totalFillers > 0) {
+    const fillerBreakdown = Object.entries(STATE.fillers)
+      .filter(([,v])=>v>0).sort(([,a],[,b])=>b-a)
+      .map(([w,c])=>`${w}(${c})`).join(', ');
+    txt += `Filler Breakdown   : ${fillerBreakdown}\n`;
+  }
+  txt += `\n${'='.repeat(50)}\nQ&A TRANSCRIPT\n${'='.repeat(50)}\n\n`;
+
+  history.forEach((q, i) => {
+    const typeLabel = {behavioral:'Behavioral',technical:'Technical',pm:'Product',general:'General'}[q.type]||'General';
+    const time = new Date(q.ts).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+    txt += `[Q${i+1}] ${typeLabel} — ${time}\n`;
+    txt += `QUESTION: ${q.fullText || q.text}\n\n`;
+    if (q.answer) {
+      txt += `ANSWER:\n${q.answer}\n`;
+    } else {
+      txt += `ANSWER: (no AI answer recorded)\n`;
+    }
+    txt += `\n${'-'.repeat(40)}\n\n`;
+  });
+
+  const blob = new Blob([txt], {type:'text/plain'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  const safeDate = new Date().toISOString().slice(0,10);
+  a.download = `VIGNIX-Session-${safeDate}.txt`;
+  a.click();
+  showToast('Transcript downloaded', 'success');
+}
+
+// ── Export as PDF (browser print) ──
+function downloadPdf() {
+  showToast('Opening print dialog — choose "Save as PDF"', 'info');
+  setTimeout(() => window.print(), 400);
+}
+
+// ═══════════════════════════════════════════
+//  SESSION 5 — MOCK INTERVIEW MODE
+// ═══════════════════════════════════════════
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id)?.classList.add('active');
+}
+
+// ── Enter / Exit ──
+function enterMockMode() {
+  if (!STATE.candidateName) {
+    showToast('Complete setup first before starting mock mode', 'warn');
+    return;
+  }
+  // Stop main mic if running
+  if (STATE.isListening) stopListening();
+
+  STATE.mockMode = true;
+  STATE.mockMessages = [];
+  STATE.mockQuestionCount = 0;
+  STATE.mockFinalTranscript = '';
+  STATE.mockLastProcessed = '';
+  STATE.mockWaitingForAnswer = false;
+
+  // Update topbar info
+  document.getElementById('mockTitle').textContent = `${STATE.targetRole} @ ${STATE.targetCompany}`;
+  document.getElementById('mockMeta').textContent = `Mock interview — ${STATE.candidateName}`;
+
+  // Reset UI
+  document.getElementById('mockChat').innerHTML = '';
+  document.getElementById('mockChat').style.display = 'none';
+  document.getElementById('mockInputBar').style.display = 'none';
+  document.getElementById('mockStartScreen').style.display = 'flex';
+  document.getElementById('mockQCounter').textContent = 'Question 0';
+
+  showScreen('mockScreen');
+}
+
+function exitMockMode() {
+  if (STATE.mockIsListening) stopMockMic();
+  clearTimeout(STATE.mockTimeout);
+  STATE.mockMode = false;
+  STATE.mockIsListening = false;
+  STATE.mockWaitingForAnswer = false;
+  showScreen('interviewScreen');
+  showToast('Mock session ended', 'info');
+}
+
+// ── Start the actual session (after "Start Interview" click) ──
+async function beginMockSession() {
+  document.getElementById('mockStartScreen').style.display = 'none';
+  document.getElementById('mockChat').style.display = 'flex';
+  document.getElementById('mockInputBar').style.display = 'flex';
+  setMockStatus('Claude is thinking of the first question…');
+  setMockMicState('idle');
+
+  if (!STATE.apiKey) {
+    mockNoApiKey();
+    return;
+  }
+  await generateMockQuestion('first');
+}
+
+// ── Build mock system prompt ──
+function buildMockSystemPrompt() {
+  const roundMap = {
+    phone:  'Phone Screen',
+    round1: 'Round 1',
+    round2: 'Round 2',
+    round3: 'Round 3',
+    final:  'Final Round',
+    panel:  'Panel Interview',
+    hiring: 'Hiring Manager Round',
+  };
+  const round = roundMap[STATE.interviewRound] || 'Interview';
+
+  return `You are the interviewer conducting a ${round} for the ${STATE.targetRole} role at ${STATE.targetCompany}.
+You are talking to ${STATE.candidateName}.
+
+CANDIDATE BACKGROUND:
+${STATE.resume}
+
+JOB DESCRIPTION:
+${STATE.jobDescription}
+
+YOUR RULES:
+- Ask exactly ONE question at a time. Nothing else.
+- For the first question: ask a natural opening question appropriate for a ${round}.
+- For follow-up questions: dig deeper into what the candidate just said. Ask for specifics, explore outcomes, or challenge an assumption. Base your follow-up on their ACTUAL answer.
+- Keep questions concise and natural — the way a real interviewer talks.
+- Do NOT give feedback, scores, coaching tips, or compliments.
+- Do NOT say "Great answer" or "Thank you for sharing that."
+- Return ONLY the question text. No preamble, no label, just the question.`;
+}
+
+// ── Generate question (first or follow-up) ──
+async function generateMockQuestion(type) {
+  appendMockThinking();
+  STATE.mockWaitingForAnswer = false;
+
+  const messages = [...STATE.mockMessages];
+  if (type === 'first') {
+    messages.push({ role: 'user', content: 'Please begin the interview with your first question.' });
+  }
+  // For follow-ups, the full conversation is already in mockMessages
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'x-api-key': STATE.apiKey,
+        'anthropic-version': '2023-06-01',
+        'content-type': 'application/json',
+        'anthropic-dangerous-direct-browser-access': 'true',
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 200,
+        stream: true,
+        system: buildMockSystemPrompt(),
+        messages: type === 'first'
+          ? [{ role: 'user', content: 'Please begin the interview with your first question.' }]
+          : messages,
+      }),
+    });
+
+    let question = '';
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+
+    // Remove thinking bubble and add real bubble
+    removeMockThinking();
+    STATE.mockQuestionCount++;
+    document.getElementById('mockQCounter').textContent = `Question ${STATE.mockQuestionCount}`;
+
+    const bubble = appendMockBubble('interviewer', '');
+    const textEl = bubble.querySelector('p');
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      const chunk = decoder.decode(value, { stream: true });
+      for (const line of chunk.split('\n')) {
+        if (!line.startsWith('data: ')) continue;
+        const data = line.slice(6).trim();
+        if (data === '[DONE]') break;
+        try {
+          const parsed = JSON.parse(data);
+          if (parsed.type === 'content_block_delta' && parsed.delta?.text) {
+            question += parsed.delta.text;
+            if (textEl) textEl.textContent = question;
+            scrollMockChat();
+          }
+        } catch {}
+      }
+    }
+
+    // Add to conversation history
+    STATE.mockMessages.push({ role: 'assistant', content: question });
+
+    // Ready for candidate answer
+    STATE.mockFinalTranscript = '';
+    STATE.mockLastProcessed = '';
+    STATE.mockWaitingForAnswer = true;
+    setMockStatus('Your turn — press the mic and answer out loud');
+    startMockMic();
+
+  } catch (err) {
+    removeMockThinking();
+    appendMockBubble('interviewer', 'Sorry, I had trouble connecting. Check your API key and try again.');
+    setMockStatus('Connection error');
+  }
+}
+
+// ── Process candidate's spoken answer ──
+function scheduleMockAnalysis(text) {
+  clearTimeout(STATE.mockTimeout);
+  STATE.mockTimeout = setTimeout(async () => {
+    if (!STATE.mockWaitingForAnswer) return;
+    if (text === STATE.mockLastProcessed || text.length < 10) return;
+    STATE.mockLastProcessed = text;
+    STATE.mockWaitingForAnswer = false;
+
+    // Stop mic
+    stopMockMic();
+    setMockMicState('processing');
+    setMockStatus('Processing your answer…');
+
+    // Show candidate bubble
+    appendMockBubble('candidate', text);
+
+    // Reset live text
+    const liveEl = document.getElementById('mockLiveText');
+    if (liveEl) liveEl.textContent = 'Waiting for follow-up question…';
+
+    // Add to conversation history
+    STATE.mockMessages.push({ role: 'user', content: text });
+
+    // Ask Claude for follow-up
+    setMockStatus('Claude is thinking of a follow-up…');
+    await generateMockQuestion('followup');
+
+  }, 2500);
+}
+
+// ── Mic controls ──
+function toggleMockMic() {
+  if (STATE.mockIsListening) {
+    stopMockMic();
+  } else {
+    startMockMic();
+  }
+}
+
+function startMockMic() {
+  if (!STATE.recognition) {
+    const ok = initRecognition();
+    if (!ok) return;
+  }
+  STATE.mockFinalTranscript = '';
+  STATE.mockIsListening = true;
+  const liveEl = document.getElementById('mockLiveText');
+  if (liveEl) liveEl.textContent = 'Listening… speak your answer';
+  setMockMicState('listening');
+  setMockStatus('Listening — speak your answer out loud');
+  try {
+    STATE.recognition.stop();
+  } catch {}
+  setTimeout(() => {
+    try { STATE.recognition.start(); } catch {}
+  }, 150);
+}
+
+function stopMockMic() {
+  STATE.mockIsListening = false;
+  setMockMicState('idle');
+  try { STATE.recognition.stop(); } catch {}
+}
+
+function setMockMicState(state) {
+  const btn = document.getElementById('mockMicBtn');
+  if (!btn) return;
+  btn.className = `mock-mic-btn ${state}`;
+  btn.textContent = state === 'listening' ? '⏹' : state === 'processing' ? '⏳' : '🎙';
+}
+
+function setMockStatus(text) {
+  const el = document.getElementById('mockStatusLine');
+  if (el) el.textContent = text;
+}
+
+// ── Chat helpers ──
+function appendMockBubble(role, text) {
+  const chat = document.getElementById('mockChat');
+  if (!chat) return null;
+  const label = role === 'interviewer' ? 'Interviewer' : STATE.candidateName || 'You';
+  const div = document.createElement('div');
+  div.className = `mock-bubble ${role}`;
+  div.innerHTML = `<div class="bubble-label">${label}</div><p>${esc(text)}</p>`;
+  chat.appendChild(div);
+  scrollMockChat();
+  return div;
+}
+
+function appendMockThinking() {
+  const chat = document.getElementById('mockChat');
+  if (!chat) return;
+  const div = document.createElement('div');
+  div.className = 'mock-bubble interviewer thinking';
+  div.id = 'mockThinking';
+  div.innerHTML = `<div class="bubble-label">Interviewer</div><p>●●●</p>`;
+  chat.appendChild(div);
+  scrollMockChat();
+}
+
+function removeMockThinking() {
+  document.getElementById('mockThinking')?.remove();
+}
+
+function scrollMockChat() {
+  const chat = document.getElementById('mockChat');
+  if (chat) chat.scrollTop = chat.scrollHeight;
+}
+
+// ── Fallback: no API key ──
+function mockNoApiKey() {
+  appendMockBubble('interviewer', 'To use Mock Mode, please go to Setup and enter your Claude API key first.');
+  setMockStatus('API key required');
+}
+
+// ═══════════════════════════════════════════
+//  SESSION 4 — CODING INTERVIEW SUPPORT
+// ═══════════════════════════════════════════
+
+// ── Language selector ──
+function setCodeLang(lang) {
+  STATE.codeLang = lang;
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.lang === lang);
+  });
+}
+
+// ── Detect coding question from speech ──
+const CODE_PATTERNS = {
+  sql:     /\b(select|from|where|join|group by|order by|having|cte|subquery|window function|partition by|rank|dense_rank|row_number|union|index|query|table|database|schema)\b/i,
+  python:  /\b(def |pandas|dataframe|numpy|list|dict|function|class|import|lambda|for loop|while loop|algorithm|array|recursion|big o|complexity)\b/i,
+  excel:   /\b(vlookup|hlookup|index match|sumif|countif|pivot|dax|measure|calculated column|power bi|power query|xlookup|formula|excel)\b/i,
+  general: /\b(algorithm|sort|search|binary|linked list|tree|graph|stack|queue|hash|complexity|o\(n\)|brute force|optimize|dynamic programming)\b/i,
+};
+
+function detectCodeLang(text) {
+  for (const [lang, pattern] of Object.entries(CODE_PATTERNS)) {
+    if (pattern.test(text)) return lang;
+  }
+  return null;
+}
+
+function checkSpeechForCoding(text) {
+  const detected = detectCodeLang(text);
+  if (detected) {
+    // Show badge on code tab to nudge user
+    const badge = document.getElementById('codeBadge');
+    if (badge && STATE.activeTab !== 'code') {
+      badge.style.display = 'inline-block';
+    }
+    // Auto-fill the code question input if it's empty
+    const input = document.getElementById('codeQuestionInput');
+    if (input && !input.value.trim()) {
+      input.value = text;
+      setCodeLang(detected);
+    }
+  }
+}
+
+// ── Build code system prompt ──
+function buildCodeSystemPrompt(lang) {
+  const langGuides = {
+    sql: `You are a SQL expert helping ${STATE.candidateName} ace a SQL coding interview.
+Give working, clean SQL code immediately. No explanations before the code.
+Use standard SQL that works in most databases (MySQL/PostgreSQL/BigQuery).
+After the code block, write 2–3 lines explaining the approach in plain English.
+Use clear formatting, aliases, and comments inside the code for clarity.`,
+
+    python: `You are a Python expert helping ${STATE.candidateName} ace a Python coding interview.
+Give working, clean Python code immediately. No explanations before the code.
+Use readable variable names. Add brief inline comments for key logic.
+After the code block, write 2–3 lines explaining the approach and time/space complexity.
+Prefer standard library unless pandas/numpy is clearly needed.`,
+
+    excel: `You are an Excel and DAX expert helping ${STATE.candidateName} ace a spreadsheet coding interview.
+Give the exact formula or DAX measure immediately. No preamble.
+For Excel: show the formula, then explain cell references and how to apply it.
+For DAX: show the full measure/calculated column syntax.
+After the formula, write 2–3 lines explaining what it does and any gotchas.`,
+
+    general: `You are a coding interview expert helping ${STATE.candidateName} ace an algorithm or logic question.
+Give a working solution in Python (unless another language is specified).
+Start with the code immediately. Add brief comments for non-obvious logic.
+After the code, write 2–3 lines on the approach and time/space complexity (Big O).
+If there's a simpler brute-force and an optimized version, show both briefly.`,
+  };
+
+  return langGuides[lang] || langGuides.general;
+}
+
+// ── Submit coding question ──
+async function submitCodeQuestion() {
+  const input = document.getElementById('codeQuestionInput');
+  const question = input?.value.trim();
+  if (!question) { showToast('Type a question first', 'warn'); return; }
+
+  const outputArea = document.getElementById('codeOutputArea');
+  const submitBtn = document.getElementById('codeSubmitBtn');
+  const lang = STATE.codeLang;
+
+  // Disable button while loading
+  if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = '⏳ Working…'; }
+
+  // Show streaming placeholder
+  outputArea.innerHTML = `
+    <div class="code-answer-box" id="codeAnswerBox">
+      <div class="code-answer-header">
+        <span class="code-answer-lang-badge">${lang.toUpperCase()}</span>
+        <span style="font-size:0.72rem;color:var(--text3)">Generating…</span>
+      </div>
+      <pre class="code-block" id="codeStream" style="color:var(--text3)">▋</pre>
+    </div>`;
+
+  if (!STATE.apiKey) {
+    // Fallback message if no API key
+    document.getElementById('codeStream').textContent = '// No API key found.\n// Go to Setup and enter your Claude API key.';
+    if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = '⚡ Get Answer  <span style="font-size:0.7rem;opacity:0.7">(Ctrl+Enter)</span>'; }
+    return;
+  }
+
+  let fullResponse = '';
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'x-api-key': STATE.apiKey,
+        'anthropic-version': '2023-06-01',
+        'content-type': 'application/json',
+        'anthropic-dangerous-direct-browser-access': 'true',
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 800,
+        stream: true,
+        system: buildCodeSystemPrompt(lang),
+        messages: [{ role: 'user', content: `Question: ${question}` }],
+      }),
+    });
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    const streamEl = document.getElementById('codeStream');
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      const chunk = decoder.decode(value, { stream: true });
+      for (const line of chunk.split('\n')) {
+        if (!line.startsWith('data: ')) continue;
+        const data = line.slice(6).trim();
+        if (data === '[DONE]') break;
+        try {
+          const parsed = JSON.parse(data);
+          if (parsed.type === 'content_block_delta' && parsed.delta?.text) {
+            fullResponse += parsed.delta.text;
+            if (streamEl) streamEl.textContent = fullResponse;
+          }
+        } catch {}
+      }
+    }
+
+    // Render final polished output
+    renderCodeAnswer(lang, question, fullResponse);
+
+    // Save to history
+    STATE.codeHistory.push({ lang, question, answer: fullResponse, ts: Date.now() });
+
+  } catch (err) {
+    outputArea.innerHTML = `<div style="padding:16px;color:var(--text3);font-size:0.82rem">Failed to get answer. Check your API key and try again.</div>`;
+  }
+
+  if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = '⚡ Get Answer  <span style="font-size:0.7rem;opacity:0.7">(Ctrl+Enter)</span>'; }
+}
+
+// ── Render final code answer ──
+function renderCodeAnswer(lang, question, rawText) {
+  const outputArea = document.getElementById('codeOutputArea');
+  if (!outputArea) return;
+
+  // Split code block from explanation
+  const codeMatch = rawText.match(/```[\w]*\n?([\s\S]*?)```/);
+  let codeContent = codeMatch ? codeMatch[1].trim() : '';
+  let explanation = codeMatch
+    ? rawText.replace(codeMatch[0], '').trim()
+    : rawText;
+
+  // If no markdown code fences, treat the whole thing as code if it looks like code
+  if (!codeContent) {
+    const looksLikeCode = /SELECT|def |=|import |\bWHERE\b|function/i.test(rawText);
+    if (looksLikeCode) {
+      codeContent = rawText;
+      explanation = '';
+    } else {
+      explanation = rawText;
+    }
+  }
+
+  const highlightedCode = syntaxHighlight(codeContent, lang);
+
+  outputArea.innerHTML = `
+    <div class="code-answer-box">
+      <div class="code-answer-header">
+        <span class="code-answer-lang-badge">${lang === 'excel' ? 'Excel / DAX' : lang.toUpperCase()}</span>
+        <button class="code-copy-btn" onclick="copyCode(this)">📋 Copy</button>
+      </div>
+      <pre class="code-block" id="codeRawText" style="display:none">${esc(codeContent)}</pre>
+      <pre class="code-block" aria-hidden="true">${highlightedCode}</pre>
+      ${explanation ? `<div class="code-explanation">${esc(explanation)}</div>` : ''}
+    </div>`;
+}
+
+// ── Syntax highlighter ──
+function syntaxHighlight(code, lang) {
+  let s = esc(code);
+  if (lang === 'sql') {
+    const kws = /\b(SELECT|FROM|WHERE|JOIN|LEFT|RIGHT|INNER|OUTER|ON|GROUP BY|ORDER BY|HAVING|WITH|AS|DISTINCT|LIMIT|UNION|ALL|AND|OR|NOT|IN|IS|NULL|COUNT|SUM|AVG|MAX|MIN|OVER|PARTITION BY|RANK|DENSE_RANK|ROW_NUMBER|CASE|WHEN|THEN|ELSE|END|INSERT|UPDATE|DELETE|CREATE|TABLE|INDEX|VIEW|CTE|BY|SET|VALUES)\b/gi;
+    s = s.replace(kws, m => `<span class="code-kw">${m}</span>`);
+  } else if (lang === 'python') {
+    const kws = /\b(def|return|import|from|class|if|elif|else|for|while|in|not|and|or|True|False|None|lambda|with|as|try|except|finally|yield|pass|break|continue|global|raise)\b/g;
+    s = s.replace(kws, m => `<span class="code-kw">${m}</span>`);
+    s = s.replace(/(#[^\n]*)/g, '<span class="code-cmt">$1</span>');
+    s = s.replace(/(\b\w+)(?=\s*\()/g, '<span class="code-fn">$1</span>');
+  } else if (lang === 'excel') {
+    const kws = /\b(VLOOKUP|HLOOKUP|INDEX|MATCH|IF|SUMIF|COUNTIF|SUMIFS|COUNTIFS|XLOOKUP|IFERROR|LEFT|RIGHT|MID|LEN|TRIM|UPPER|LOWER|CONCATENATE|TEXT|DATE|YEAR|MONTH|DAY|CALCULATE|FILTER|RELATED|SUMX|COUNTX|ALL|VALUES|EARLIER|SWITCH|DIVIDE|BLANK|TRUE|FALSE)\b/gi;
+    s = s.replace(kws, m => `<span class="code-kw">${m}</span>`);
+  } else {
+    const kws = /\b(def|return|import|class|if|elif|else|for|while|in|not|and|or|True|False|None|lambda|function|var|let|const|new|this|null|undefined|int|str|bool|list|dict|print)\b/g;
+    s = s.replace(kws, m => `<span class="code-kw">${m}</span>`);
+    s = s.replace(/(#[^\n]*|\/\/[^\n]*)/g, '<span class="code-cmt">$1</span>');
+  }
+  // Numbers
+  s = s.replace(/\b(\d+\.?\d*)\b/g, '<span class="code-num">$1</span>');
+  // Strings (basic)
+  s = s.replace(/(&quot;[^&]*?&quot;|&#x27;[^&]*?&#x27;)/g, m => `<span class="code-str">${m}</span>`);
+  return s;
+}
+
+// ── Copy code to clipboard ──
+function copyCode(btn) {
+  const rawEl = btn?.closest('.code-answer-box')?.querySelector('#codeRawText');
+  const text = rawEl ? rawEl.textContent : '';
+  if (!text) { showToast('Nothing to copy', 'warn'); return; }
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✅ Copied!';
+    setTimeout(() => { btn.textContent = '📋 Copy'; }, 2000);
+  }).catch(() => showToast('Copy failed', 'warn'));
+}
+
+// ═══════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  loadSavedSetup();
+  loadStories();
+  saveInterval = setInterval(autoSaveSession, 30000);
+});
+</script>
+</body>
+</html>

@@ -820,13 +820,13 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
   </div>
 
   <!-- Card 1: API Key (hidden once saved) -->
-  <div class="setup-card" id="apiKeyCard">
+  <div class="setup-card" id="apiKeyCard" style="display:none">
     <div class="setup-card-title">🔑 AI Configuration</div>
     <div class="form-row full">
       <div class="form-group">
         <label class="form-label">Claude API Key <span>*</span></label>
         <div class="api-key-wrap">
-          <input type="password" id="apiKey" class="form-input" placeholder="sk-ant-api03-..." autocomplete="off"/>
+          <input type="password" id="apiKey" class="form-input" placeholder="sk-ant-api03-..." autocomplete="off" value="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"/>
           <button class="api-key-toggle" onclick="toggleApiKey()">Show</button>
         </div>
         <div class="field-error" id="apiKeyError">API key is required for AI-powered answers</div>
@@ -839,7 +839,7 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
   </div>
 
   <!-- API key saved indicator (shown when key is already saved) -->
-  <div id="apiKeySavedRow" style="display:none;width:100%;max-width:680px;margin-bottom:4px">
+  <div id="apiKeySavedRow" style="display:flex;width:100%;max-width:680px;margin-bottom:4px">
     <div style="display:flex;align-items:center;justify-content:space-between;background:var(--green-dim);border:1px solid rgba(22,163,74,0.2);border-radius:var(--radius-sm);padding:10px 16px;font-size:0.8rem">
       <span style="color:var(--green);font-weight:600">✅ Claude API key saved</span>
       <button onclick="showApiKeyCard()" style="background:none;border:none;color:var(--text2);font-size:0.75rem;cursor:pointer;text-decoration:underline">Change key</button>
@@ -1340,7 +1340,7 @@ body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--
 // ═══════════════════════════════════════════
 const STATE = {
   // Setup
-  apiKey: '',
+  apiKey: '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',
   candidateName: '',
   targetRole: '',
   targetCompany: '',

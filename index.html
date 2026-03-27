@@ -1663,8 +1663,9 @@ function toggleApiKey() {
 }
 
 function showApiKeyCard() {
-  document.getElementById('apiKeyCard').style.display = 'block';
-  document.getElementById('apiKeySavedRow').style.display = 'none';
+  // API key is hardcoded — card stays hidden
+  document.getElementById('apiKeyCard').style.display = 'none';
+  document.getElementById('apiKeySavedRow').style.display = 'flex';
 }
 
 // Track progress
@@ -1703,11 +1704,11 @@ function loadSavedSetup() {
     if (data.targetRole) document.getElementById('targetRole').value = data.targetRole;
     if (data.resume) document.getElementById('resume').value = data.resume;
     if (data.jobDescription) document.getElementById('jobDescription').value = data.jobDescription;
+    // API key is hardcoded — always hidden
+    document.getElementById('apiKeyCard').style.display = 'none';
+    document.getElementById('apiKeySavedRow').style.display = 'flex';
     if (data.apiKey) {
       document.getElementById('apiKey').value = data.apiKey;
-      // Hide API card, show saved indicator
-      document.getElementById('apiKeyCard').style.display = 'none';
-      document.getElementById('apiKeySavedRow').style.display = 'block';
     }
     if (data.interviewType) {
       STATE.interviewType = data.interviewType;

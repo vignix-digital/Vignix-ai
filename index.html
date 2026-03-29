@@ -1704,12 +1704,9 @@ function loadSavedSetup() {
     if (data.targetRole) document.getElementById('targetRole').value = data.targetRole;
     if (data.resume) document.getElementById('resume').value = data.resume;
     if (data.jobDescription) document.getElementById('jobDescription').value = data.jobDescription;
-    // API key is hardcoded — always hidden
+    // API key is hardcoded — always hidden, never load from localStorage
     document.getElementById('apiKeyCard').style.display = 'none';
     document.getElementById('apiKeySavedRow').style.display = 'flex';
-    if (data.apiKey) {
-      document.getElementById('apiKey').value = data.apiKey;
-    }
     if (data.interviewType) {
       STATE.interviewType = data.interviewType;
       document.querySelectorAll('.type-option').forEach(o => {
@@ -1741,7 +1738,7 @@ function saveSetup() {
     targetRole: document.getElementById('targetRole').value.trim(),
     resume: document.getElementById('resume').value.trim(),
     jobDescription: document.getElementById('jobDescription').value.trim(),
-    apiKey: document.getElementById('apiKey').value.trim(),
+    apiKey: STATE.apiKey,
     interviewType: STATE.interviewType,
     tone: STATE.tone,
     interviewRound: document.getElementById('interviewRound').value,
